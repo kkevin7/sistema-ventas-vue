@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname,'public')));
 
-app.set('port', process.env.PORT || 3000)
+app.set('port', process.env.PORT || 3000);
 
 app.listen(app.get('port'), () => {
     console.log('server on port '+app.get('port'));
