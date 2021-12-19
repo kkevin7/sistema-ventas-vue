@@ -12,19 +12,19 @@ export default {
             next(e);
         }
     },
-    query: async(req, res, next) => {
+    query: async (req,res,next) => {
         try {
-            const ref = await models.Categoria.findOne({ _id: req.query._id });
-            if(!reg){
+            const reg=await models.Categoria.findOne({_id: req.query._id});
+            if (!reg){
                 res.status(404).send({
                     message: 'El registro no existe'
                 });
-            }else{
-                res.status(200).json(reg)
+            } else{
+                res.status(200).json(reg);
             }
-        } catch (e) {
+        } catch(e){
             res.status(500).send({
-                message: 'Ocurrio un error'
+                message:'Ocurrió un error'
             });
             next(e);
         }
@@ -40,24 +40,24 @@ export default {
             next(e);
         }
     },
-    update:async(req, res, next) => {
+    update: async (req,res,next) => {
         try {
-            const reg = await models.Categoria.findByIdAndUpdate({_id: req.body._id}, {nombre: req.body.nombre, description: req.body.description })
+            const reg = await models.Categoria.findByIdAndUpdate({_id:req.body._id},{nombre:req.body.nombre,descripcion:req.body.descripcion});
             res.status(200).json(reg);
-        } catch (e) {
+        } catch(e){
             res.status(500).send({
-                message: 'Ocurrio un error'
+                message:'Ocurrió un error'
             });
             next(e);
         }
     },
-    remove:async(req, res, next) => {
+    remove: async (req,res,next) => {
         try {
-            const ref = await models.Categoria.findOneAndDelete({_id: req.body._id});
+            const reg = await models.Categoria.findByIdAndDelete({_id:req.body._id});
             res.status(200).json(reg);
-        } catch (e) {
+        } catch(e){
             res.status(500).send({
-                message: 'Ocurrio un error'
+                message:'Ocurrió un error'
             });
             next(e);
         }
