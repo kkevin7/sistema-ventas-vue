@@ -52,7 +52,7 @@ export default {
                 { 
                     categoria: req.body.categoria, 
                     codigo: req.body.codigo,
-                    nombre: req.body.nombre, 
+                    nombre: req.body.nombre,
                     descripcion: req.body.descripcion,
                     precio_venta: req.body.precio_venta,
                     stock: req.body.stock,

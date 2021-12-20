@@ -1,9 +1,11 @@
 import models from '../models';
+import bcrypt from 'bcryptjs/dist/bcrypt';
 
 export default {
     add: async (req, res, next) => {
         try {
-            const reg = await models.Categoria.create(req.body);
+            req.body.password = await bcrypt.hash(req.body.password, 10);
+            const reg = await models.Usuario.create(req.body);
             res.status(200).json(reg);
         } catch (e) {
             res.status(500).send({
@@ -14,7 +16,7 @@ export default {
     },
     query: async (req, res, next) => {
         try {
-            const reg = await models.Categoria.findOne({ _id: req.query._id });
+            const reg = await models.Usuario.findOne({ _id: req.query._id });
             if (!reg) {
                 res.status(404).send({
                     message: 'El registro no existe'
@@ -33,8 +35,8 @@ export default {
         try {
             let valor = req.query.valor;
             const reg = await models.Categoria
-            .find({ $or: [{ 'nombre': new RegExp(valor, 'i') }, { 'descripcion': new RegExp(valor, 'i') }] }, { createAt: 0 })
-            .sort({ 'createAt': -1 });
+                .find({ $or: [{ 'nombre': new RegExp(valor, 'i') }, { 'email': new RegExp(valor, 'i') }] }, { createAt: 0 })
+                .sort({ 'createAt': -1 });
             res.status(200).json(reg);
         } catch (e) {
             res.status(500).send({
@@ -45,10 +47,22 @@ export default {
     },
     update: async (req, res, next) => {
         try {
-            const reg = await models.Categoria.findByIdAndUpdate({ _id: req.body._id }, 
-                { 
+            let pass = req.body.password;
+            const user = await models.Usuario.findOne({ _id: req.body._id });
+            if (pass != user.password) {
+                req.body.password = await bcrypt.hash(req.body.password, 10);
+            }
+            const reg = await models.Usuario.findByIdAndUpdate({ _id: req.body._id },
+                {
+                    rol: req.body.rol,
                     nombre: req.body.nombre,
-                    descripcion: req.body.descripcion,
+                    tipo_documento: req.body.tipo_documento,
+                    num_documento: req.body.num_documento,
+                    direccion: req.body.direccion,
+                    telefono: req.body.telefono,
+                    email: req.body.email,
+                    password: req.body.password,
+                    estado: req.body.estado,
                 });
             res.status(200).json(reg);
         } catch (e) {
@@ -60,7 +74,7 @@ export default {
     },
     remove: async (req, res, next) => {
         try {
-            const reg = await models.Categoria.findByIdAndDelete({ _id: req.body._id });
+            const reg = await models.Usuario.findByIdAndDelete({ _id: req.body._id });
             res.status(200).json(reg);
         } catch (e) {
             res.status(500).send({
@@ -71,7 +85,7 @@ export default {
     },
     activate: async (req, res, next) => {
         try {
-            const reg = await models.Categoria.findByIdAndUpdate({ _id: req.body._id }, { estado: 1 });
+            const reg = await models.Usuario.findByIdAndUpdate({ _id: req.body._id }, { estado: 1 });
             res.status(200).json(reg);
         } catch (e) {
             res.status(500).send({
@@ -82,7 +96,7 @@ export default {
     },
     deactivate: async (req, res, next) => {
         try {
-            const reg = await models.Categoria.findByIdAndUpdate({ _id: req.body._id }, { estado: 0 });
+            const reg = await models.Usuario.findByIdAndUpdate({ _id: req.body._id }, { estado: 0 });
             res.status(200).json(reg);
         } catch (e) {
             res.status(500).send({
