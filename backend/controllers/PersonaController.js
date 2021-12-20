@@ -32,7 +32,7 @@ export default {
     list: async (req, res, next) => {
         try {
             let valor = req.query.valor;
-            const reg = await models.Categoria
+            const reg = await models.Persona
                 .find({ $or: [{ 'nombre': new RegExp(valor, 'i') }, { 'email': new RegExp(valor, 'i') }] }, { createAt: 0 })
                 .sort({ 'createAt': -1 });
             res.status(200).json(reg);
@@ -46,12 +46,14 @@ export default {
     listClientes: async (req, res, next) => {
         try {
             let valor = req.query.valor;
-            const reg = await models.Categoria
-                .find({ $or: [
+            const reg = await models.Persona
+                .find(
+                { $or: [
                     { 'nombre': new RegExp(valor, 'i') }, 
                     { 'email': new RegExp(valor, 'i') },
-                    { 'tipo_persona': 'Cliente' },
-                ] }, { createAt: 0 })
+                ],
+                'tipo_persona': 'Cliente',
+                }, { createAt: 0 })
                 .sort({ 'createAt': -1 });
             res.status(200).json(reg);
         } catch (e) {
@@ -64,12 +66,14 @@ export default {
     listProveedores: async (req, res, next) => {
         try {
             let valor = req.query.valor;
-            const reg = await models.Categoria
-                .find({ $or: [
+            const reg = await models.Persona
+                .find(
+                { $or: [
                     { 'nombre': new RegExp(valor, 'i') }, 
                     { 'email': new RegExp(valor, 'i') },
-                    { 'tipo_persona': 'Proveedor' },
-                ] }, { createAt: 0 })
+                ],
+                'tipo_persona': 'Proveedor',
+                }, { createAt: 0 })
                 .sort({ 'createAt': -1 });
             res.status(200).json(reg);
         } catch (e) {
@@ -83,7 +87,7 @@ export default {
         try {
             const reg = await models.Persona.findByIdAndUpdate({ _id: req.body._id },
                 {
-                    tipo_person: req.body.tipo_person,
+                    tipo_persona: req.body.tipo_persona,
                     nombre: req.body.nombre,
                     tipo_documento: req.body.tipo_documento,
                     num_documento: req.body.num_documento,
