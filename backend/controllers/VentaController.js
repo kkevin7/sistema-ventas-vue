@@ -14,11 +14,11 @@ async function disminuirStock(id_acticulo, cantidad){
 export default {
     add: async (req, res, next) => {
         try {
-            const reg = await models.Ingreso.create(req.body);
+            const reg = await models.Venta.create(req.body);
             //Actualizar Stock
             let detalles = req.body.detalles;
             detalles.map(function(x){
-                aumentarStock(x._id, x.cantidad);
+                disminuirStock(x._id, x.cantidad);
             });
             res.status(200).json(reg);
         } catch (e) {
@@ -30,9 +30,9 @@ export default {
     },
     query: async (req, res, next) => {
         try {
-            const reg = await models.Ingreso.findOne({ _id: req.query._id })
-            .populate('usuario', {nombre: 1})
-            .populate('persona', {nombre: 1});
+            const reg = await models.Venta.findOne({_id:req.query._id})
+            .populate('usuario',{nombre:1})
+            .populate('persona',{nombre:1});
             if (!reg) {
                 res.status(404).send({
                     message: 'El registro no existe'
@@ -66,7 +66,7 @@ export default {
     /*
     update: async (req, res, next) => {
         try {
-            const reg = await models.Ingreso.findByIdAndUpdate({ _id: req.body._id }, 
+            const reg = await models.Venta.findByIdAndUpdate({ _id: req.body._id }, 
                 { 
                     nombre: req.body.nombre,
                     descripcion: req.body.descripcion,
@@ -81,7 +81,7 @@ export default {
     },
     remove: async (req, res, next) => {
         try {
-            const reg = await models.Ingreso.findByIdAndDelete({ _id: req.body._id });
+            const reg = await models.Venta.findByIdAndDelete({ _id: req.body._id });
             res.status(200).json(reg);
         } catch (e) {
             res.status(500).send({
@@ -97,7 +97,7 @@ export default {
             //Actualizar stock
             let detalles=reg.detalles;
             detalles.map(function(x){
-                aumentarStock(x._id, x.cantidad);
+                disminuirStock(x._id, x.cantidad);
             });
             res.status(200).json(reg);
         } catch (e) {
@@ -113,7 +113,7 @@ export default {
             //Actualizar stock
             let detalles=reg.detalles;
             detalles.map(function(x){
-                disminuirStock(x._id, x.cantidad);
+                aumentarStock(x._id, x.cantidad);
             });
             res.status(200).json(reg);
         } catch (e) {

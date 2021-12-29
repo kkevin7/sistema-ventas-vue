@@ -3,6 +3,7 @@ import Articulo from "./Articulo";
 import Usuario from "./Usuario";
 import Persona from "./Persona";
 import Ingreso from "./Ingreso";
+import Venta from "./Venta";
 
 export default {
     Categoria,
@@ -10,4 +11,5 @@ export default {
     Usuario,
     Persona,
     Ingreso,
+    Venta,
 }
