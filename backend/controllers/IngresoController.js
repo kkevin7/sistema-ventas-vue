@@ -2,12 +2,12 @@ import models from '../models';
 
 async function aumentarStock(id_acticulo, cantidad){
     let {stock} = await models.Articulo.findOne({_id: id_acticulo});
-    let nStock = parseInt(stock)+parseIntI(cantidad);
+    let nStock = parseInt(stock)+parseInt(cantidad);
     const reg = await models.Articulo.findByIdAndUpdate({_id: id_acticulo}, {stock: nStock});
 }
 async function disminuirStock(id_acticulo, cantidad){
     let {stock} = await models.Articulo.findOne({_id: id_acticulo});
-    let nStock = parseInt(stock)-parseIntI(cantidad);
+    let nStock = parseInt(stock)-parseInt(cantidad);
     const reg = await models.Articulo.findByIdAndUpdate({_id: id_acticulo}, {stock: nStock});
 }
 
