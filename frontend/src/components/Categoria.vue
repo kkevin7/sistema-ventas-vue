@@ -104,9 +104,9 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="green darken-1" flat="flat" @click="cerrar()"> Cancelar </v-btn>
-                  <v-btn color="orange darken-1" flat="flat" @click="activar()" v-if="adAccion===1"> Activar </v-btn>
-                  <v-btn color="orange darken-4" flat="flat" @click="desactivar()" v-if="adAccion===2"> Desactivar </v-btn>
+                  <v-btn color="green darken-1" text @click="cerrar()"> Cancelar </v-btn>
+                  <v-btn color="orange darken-1" text @click="activar()" v-if="adAccion===1"> Activar </v-btn>
+                  <v-btn color="orange darken-4" text @click="desactivar()" v-if="adAccion===2"> Desactivar </v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -179,10 +179,11 @@ export default {
 
   methods: {
     listar() {
+      let header = {'Token': this.$store.state.token};
+      let configuracion = {headers: header};
       axios
-        .get("categoria/list")
+        .get("categoria/list", configuracion)
         .then((response) => {
-          console.log(response.data);
           this.categorias = response.data;
         })
         .catch((error) => {
@@ -220,6 +221,9 @@ export default {
     },
 
     guardar() {
+      let header = {'Token': this.$store.state.token};
+      let configuracion = {headers: header};
+
       if (this.validar()) {
         return;
       }
@@ -230,7 +234,8 @@ export default {
             _id: this._id,
             nombre: this.nombre,
             descripcion: this.descripcion,
-          })
+          }, 
+          configuracion)
           .then((response) => {
             this.limpiar();
             this.close();
@@ -244,7 +249,8 @@ export default {
           .post("categoria/add", {
             nombre: this.nombre,
             descripcion: this.descripcion,
-          })
+          },
+          configuracion)
           .then((response) => {
             this.limpiar();
             this.close();
@@ -278,10 +284,14 @@ export default {
     },
 
     activar() {
+      let header = {'Token': this.$store.state.token};
+      let configuracion = {headers: header};
+
       axios
         .put("categoria/activate", {
           _id: this._id
-        })
+        },
+        configuracion)
         .then((response) => {
           this.limpiar();
           this.close();
@@ -293,10 +303,14 @@ export default {
     },
 
     desactivar() {
+      let header = {'Token': this.$store.state.token};
+      let configuracion = {headers: header};
+
       axios
         .put("categoria/deactivate", {
           _id: this._id
-        })
+        },
+        configuracion)
         .then((response) => {
           this.limpiar();
           this.close();
