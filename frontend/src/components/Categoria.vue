@@ -216,7 +216,6 @@ export default {
       this.validaMensaje = [];
       this.editedIndex = -1;
       this.adModal = 0;
-      this.adId = null;
     },
 
     validar() {
@@ -286,7 +285,7 @@ export default {
     toogleActivate(action, item) {
       this.adModal = 1;
       this.adNombre = item.nombre;
-      this.adId = item._id;
+      this._id = item._id;
       if (action === 1) {
         this.adAccion = 1;
       } else if (action === 2) {
@@ -299,7 +298,7 @@ export default {
     activar() {
       axios
         .put("categoria/activate", {
-          _id: this.adId
+          _id: this._id
         })
         .then((response) => {
           this.limpiar();
@@ -314,7 +313,7 @@ export default {
     desactivar() {
       axios
         .put("categoria/deactivate", {
-          _id: this.adId
+          _id: this._id
         })
         .then((response) => {
           this.limpiar();
