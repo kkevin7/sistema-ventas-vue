@@ -140,8 +140,11 @@
         <span class="hidden-sm-and-down">System VueJS</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon>
+      <v-btn v-if="logueado" @click="salir()" icon >
         <v-icon>logout</v-icon>
+      </v-btn>
+      <v-btn v-else color="accent" :to="{name: 'login'}">
+        <v-icon>apps</v-icon> Login
       </v-btn>
     </v-app-bar>
 
@@ -198,7 +201,9 @@ export default {
   },
 
   methods: {
-    
+    salir(){
+      this.$store.dispatch('salir');
+    }
   },
 };
 </script>
