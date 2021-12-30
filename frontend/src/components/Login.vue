@@ -13,7 +13,7 @@
                 </v-card-text>
                 <v-card-actions class="px-3 pb-3">
                     <v-flex text-xs-right>
-                        <v-btn color="primary">Ingresar</v-btn>
+                        <v-btn color="primary" @click="ingresar()">Ingresar</v-btn>
                     </v-flex>
                 </v-card-actions>
             </v-card>
@@ -22,11 +22,28 @@
 </template>
 
 <script>
+
+import axios from 'axios';
+
 export default {
     data() {
         return {
             email: '',
             password: ''
+        }
+    },
+    methods: {
+        ingresar(){
+            axios.post('usuario/login', {
+                email: this.email,
+                password: this.password
+            })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error)
+            });
         }
     },
 }
