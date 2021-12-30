@@ -75,9 +75,7 @@
 
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="close">
-                    Cancelar
-                  </v-btn>
+                  <v-btn color="blue darken-1" text @click="close">Cancelar</v-btn>
                   <v-btn color="blue darken-1" text @click="guardar"> Guardar </v-btn>
                 </v-card-actions>
               </v-card>
@@ -176,6 +174,7 @@ export default {
       this.descripcion = '';
       this.valida=0;
       this.validaMensaje=[];
+      this.editedIndex=-1;
     },
     validar(){
       this.valida=0;
@@ -198,7 +197,17 @@ export default {
       }
 
       if(this.editedIndex > -1){
-                
+        axios.put('categoria/update', {
+          '_id': this._id,
+          'nombre': this.nombre,
+          'descripcion': this.descripcion
+        }).then((response) => {
+          this.limpiar();
+          this.close();
+          this.listar();
+        }).catch(error => {
+          console.log(error);
+        });
       }else{
         axios.post('categoria/add', {
           'nombre': this.nombre,
@@ -209,14 +218,16 @@ export default {
           this.listar();
         }).catch(error => {
           console.log(error);
-        })
+        });
       }
     },
 
     editItem(item) {
-      this.editedIndex = this.categorias.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+      this._id = item._id;
+      this.nombre = item.nombre;
+      this.descripcion = item.descripcion
       this.dialog = true;
+      this.editedIndex = 1;
     },
 
     deleteItem(item) {
