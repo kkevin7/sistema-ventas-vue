@@ -5,7 +5,7 @@
         :headers="headers"
         :items="categorias"
         :search="search"
-        sort-by="calories"
+        sort-by="nombre"
         class="elevation-1"
       >
 
@@ -52,34 +52,16 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
-                      <v-col cols="12" sm="6" md="4">
+                      <v-col cols="12" sm="12" md="12">
                         <v-text-field
-                          v-model="editedItem.name"
-                          label="Dessert name"
+                          v-model="nombre"
+                          label="Nombre"
                         ></v-text-field>
                       </v-col>
-                      <v-col cols="12" sm="6" md="4">
+                      <v-col cols="12" sm="12" md="12">
                         <v-text-field
-                          v-model="editedItem.calories"
-                          label="Calories"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.fat"
-                          label="Fat (g)"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.carbs"
-                          label="Carbs (g)"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.protein"
-                          label="Protein (g)"
+                          v-model="descripcion"
+                          label="Descripcion"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -89,9 +71,9 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="blue darken-1" text @click="close">
-                    Cancel
+                    Cancelar
                   </v-btn>
-                  <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+                  <v-btn color="blue darken-1" text @click="guardar"> Guardar </v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -145,25 +127,14 @@ export default {
       { text: "Actions", value: "actions", sortable: false },
     ],
     editedIndex: -1,
-    editedItem: {
-      name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
-    },
-    defaultItem: {
-      name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
-    },
+    _id: '',
+    nombre: '',
+    descripcion: ''
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+      return this.editedIndex === -1 ? "Nuevo Registro" : "Editar Registro";
     },
   },
 
@@ -185,37 +156,54 @@ export default {
       axios
         .get("categoria/list")
         .then((response) => {
-          console.log(response);
+          console.log(response.data);
           this.categorias = response.data;
         })
         .catch((error) => {
           console.log(error);
         });
     },
+    limpiar(){
+      this._id = '',
+      this.nombre = '',
+      this.descripcion = ''
+    },
+    guardar(){
+      if(this.editedIndex > -1){
+                
+      }else{
+        axios.post('categoria/add', {
+          'nombre': this.nombre,
+          'descripcion': this.descripcion
+        }).then((response) => {
+          this.limpiar();
+          this.close();
+          this.listar();
+        }).catch(error => {
+          console.log(error);
+        })
+      }
+    },
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.categorias.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.categorias.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
+      this.categorias.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
     close() {
       this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
     },
 
     closeDelete() {
@@ -226,14 +214,6 @@ export default {
       });
     },
 
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-      } else {
-        this.desserts.push(this.editedItem);
-      }
-      this.close();
-    },
   },
 };
 </script>
