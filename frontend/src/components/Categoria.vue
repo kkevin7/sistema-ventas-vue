@@ -3,17 +3,34 @@
     <v-flex>
       <v-data-table
         :headers="headers"
-        :items="desserts"
+        :items="categorias"
         :search="search"
         sort-by="calories"
         class="elevation-1"
       >
+
+        <template v-slot:[`item.estado`]="{ item }">
+            <div v-if="item.estado">
+                <span class="blue--text">Activo</span>
+            </div>
+            <div v-else>
+                <span class="red--text">Inactivo</span>
+            </div>
+        </template>
+
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>Categorias</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
-            <v-text-field class="text-xs-center" v-model="search" append-icon="search" label="Busqueda" single-line hide-details/>
+            <v-text-field
+              class="text-xs-center"
+              v-model="search"
+              append-icon="search"
+              label="Busqueda"
+              single-line
+              hide-details
+            />
             <v-spacer></v-spacer>
             <v-dialog v-model="dialog" max-width="500px">
               <template v-slot:activator="{ on, attrs }">
@@ -24,7 +41,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  Nuevo
+                  Nueva Categoria
                 </v-btn>
               </template>
               <v-card>
@@ -96,41 +113,37 @@
               </v-card>
             </v-dialog>
           </v-toolbar>
+        </template> 
+
+        <template v-slot:[`item.actions`]="{ item }">
+          <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+          <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
         </template>
-        <template v-slot:item.actions="{ item }">
-          <v-icon small class="mr-2" @click="editItem(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
-        </template>
+
         <template v-slot:no-data>
-          <v-btn color="primary" @click="initialize"> Reset </v-btn>
+          <v-btn color="primary" @click="listar()"> Reset </v-btn>
         </template>
+
       </v-data-table>
     </v-flex>
   </v-layout>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data: () => ({
+    search: "",
+    categorias: [],
     dialog: false,
-    search: '',
     dialogDelete: false,
     headers: [
-      {
-        text: "Dessert (100g serving)",
-        align: "start",
-        sortable: false,
-        value: "name",
-      },
-      { text: "Calories", value: "calories" },
-      { text: "Fat (g)", value: "fat" },
-      { text: "Carbs (g)", value: "carbs" },
-      { text: "Protein (g)", value: "protein" },
+      { text: "Nombre", value: "nombre", sortable: true },
+      { text: "Descripcion", value: "descripcion", sortable: true },
+      { text: "Estado", value: "estado", sortable: false },
       { text: "Actions", value: "actions", sortable: false },
     ],
-    desserts: [],
     editedIndex: -1,
     editedItem: {
       name: "",
@@ -164,20 +177,20 @@ export default {
   },
 
   created() {
-    this.initialize();
+    this.listar();
   },
 
   methods: {
-    initialize() {
-      this.desserts = [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-        },
-      ];
+    listar() {
+      axios
+        .get("categoria/list")
+        .then((response) => {
+          console.log(response);
+          this.categorias = response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     editItem(item) {
