@@ -8,8 +8,11 @@
                     </v-toolbar-title>
                 </v-toolbar>
                 <v-card-text>
-                    <v-text-field v-model="email" autofocus color="accent" label="Email" required ></v-text-field>
+                    <v-text-field v-model="email" type="email" autofocus color="accent" label="Email" required ></v-text-field>
                     <v-text-field v-model="password" type="password" color="accent" label="Password" required></v-text-field>
+                    <v-flex class="red--text" v-if="error">
+                        {{error}}
+                    </v-flex>
                 </v-card-text>
                 <v-card-actions class="px-3 pb-3">
                     <v-flex text-xs-right>
@@ -29,7 +32,8 @@ export default {
     data() {
         return {
             email: '',
-            password: ''
+            password: '',
+            error: null,
         }
     },
     methods: {
@@ -39,10 +43,20 @@ export default {
                 password: this.password
             })
             .then(response => {
-                console.log(response.data);
+                return response.data;
+            })
+            .then(data => {
+                this.$store.dispatch('guardarToken', data.tokenReturn);
+                this.$router.push({name: 'home'});
             })
             .catch(error => {
-                console.log(error)
+                // console.log(error)
+                this.error = null;
+                if(error.response.status === 404){
+                    this.error = "No existe el usuario o las credenciales son incorrectas";
+                }else{
+                    this.error = 'Ocurrio un error con el servidor';
+                }
             });
         }
     },

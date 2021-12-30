@@ -2,12 +2,13 @@
   <v-app id="app">
     <!-- Sidebar -->
     <v-navigation-drawer
-      v-model="drawer"
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
+      v-model="drawer"
+      v-if="logueado"
     >
       <v-list dense>
-        <template>
+        <template v-if="esAdministrador || esAlmacenero || esVendedor">
           <v-list-item>
             <v-list-item-action>
               <v-icon>home</v-icon>
@@ -15,7 +16,7 @@
             <v-list-item-title>Inicio</v-list-item-title>
           </v-list-item>
         </template>
-        <template>
+        <template v-if="esAdministrador || esAlmacenero">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -40,7 +41,7 @@
             </v-list-item>
           </v-list-group>
         </template>
-        <template>
+        <template v-if="esAdministrador || esAlmacenero">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -65,7 +66,7 @@
             </v-list-item>
           </v-list-group>
         </template>
-        <template>
+        <template v-if="esAdministrador || esVendedor">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -82,7 +83,7 @@
             </v-list-item>
           </v-list-group>
         </template>
-        <template>
+        <template v-if="esAdministrador">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -99,7 +100,7 @@
             </v-list-item>
           </v-list-group>
         </template>
-        <template>
+        <template v-if="esAdministrador || esAlmacenero || esVendedor">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -173,8 +174,31 @@ export default {
   name: "App",
 
   data: () => ({
-    drawer: null,
+    drawer: true,
     year: new Date().getFullYear(),
   }),
+
+  computed: {
+    logueado(){
+      return this.$store.state.usuario;
+    },
+    esAdministrador(){
+      return this.$store.state.usuario && this.$store.state.usuario.rol === 'Administrador';
+    },
+    esAlmacenero(){
+      return this.$store.state.usuario && this.$store.state.usuario.rol === 'Almacenero';
+    },
+    esVendedor(){
+      return this.$store.state.usuario && this.$store.state.usuario.rol === 'Vendedor';
+    }
+  },
+
+  created() {
+    this.$store.dispatch("autoLogin");
+  },
+
+  methods: {
+    
+  },
 };
 </script>
