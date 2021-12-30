@@ -64,6 +64,11 @@
                           label="Descripcion"
                         ></v-text-field>
                       </v-col>
+                      <v-col cols="12" sm="12" md="12" v-show="valida">
+                        <div class="red--text" v-for="v in validaMensaje" :key="v" v-text="v" >
+                          
+                        </div>
+                      </v-col>
                     </v-row>
                   </v-container>
                 </v-card-text>
@@ -129,7 +134,9 @@ export default {
     editedIndex: -1,
     _id: '',
     nombre: '',
-    descripcion: ''
+    descripcion: '',
+    valida: 0,
+    validaMensaje: [],
   }),
 
   computed: {
@@ -164,11 +171,32 @@ export default {
         });
     },
     limpiar(){
-      this._id = '',
-      this.nombre = '',
-      this.descripcion = ''
+      this._id = '';
+      this.nombre = '';
+      this.descripcion = '';
+      this.valida=0;
+      this.validaMensaje=[];
+    },
+    validar(){
+      this.valida=0;
+      this.validaMensaje=[];
+      if(this.nombre.length < 1 || this.nombre.length > 50){
+        this.validaMensaje.push('El nombre de la categoria debe tener entre 1-50 caracteres.');
+      }
+      if(this.descripcion.length > 255){
+        this.validaMensaje.push('La descripcion de la categoria no debe tener mas de 255 caracteres.');
+      }
+      if(this.validaMensaje.length){
+        this.valida = 1;
+      }
+      return this.valida;
     },
     guardar(){
+
+      if(this.validar()){
+        return;
+      }
+
       if(this.editedIndex > -1){
                 
       }else{
