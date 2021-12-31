@@ -59,17 +59,17 @@
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6" md="6">
-                        <v-select 
-                        v-model="rol"
-                        :items="roles"
-                        label="Rol"
+                        <v-select
+                          v-model="rol"
+                          :items="roles"
+                          label="Rol"
                         ></v-select>
                       </v-col>
                       <v-col cols="12" sm="6" md="6">
-                        <v-select 
-                        v-model="tipo_documento"
-                        :items="documentos"
-                        label="Tipo Documento"
+                        <v-select
+                          v-model="tipo_documento"
+                          :items="documentos"
+                          label="Tipo Documento"
                         ></v-select>
                       </v-col>
                       <v-col cols="12" sm="6" md="6">
@@ -144,9 +144,25 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="green darken-1" text @click="cerrar()"> Cancelar </v-btn>
-                  <v-btn color="orange darken-1" text @click="activar()" v-if="adAccion===1"> Activar </v-btn>
-                  <v-btn color="orange darken-4" text @click="desactivar()" v-if="adAccion===2"> Desactivar </v-btn>
+                  <v-btn color="green darken-1" text @click="cerrar()">
+                    Cancelar
+                  </v-btn>
+                  <v-btn
+                    color="orange darken-1"
+                    text
+                    @click="activar()"
+                    v-if="adAccion === 1"
+                  >
+                    Activar
+                  </v-btn>
+                  <v-btn
+                    color="orange darken-4"
+                    text
+                    @click="desactivar()"
+                    v-if="adAccion === 2"
+                  >
+                    Desactivar
+                  </v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -194,15 +210,15 @@ export default {
     editedIndex: -1,
     _id: "",
     nombre: "",
-    rol: '',
-    roles: ['Administrador','Almacenero','Vendedor'],
+    rol: "",
+    roles: ["Administrador", "Almacenero", "Vendedor"],
     tipo_documento: "",
-    documentos: ['DNI', 'RUC', 'PASAPORTE', 'CEDULA'],
-    num_documento: '',
-    direccion: '',
-    telefono: '',
-    email: '',
-    password: '',
+    documentos: ["DUI","DNI","NIT","RUC", "PASAPORTE", "CEDULA"],
+    num_documento: "",
+    direccion: "",
+    telefono: "",
+    email: "",
+    password: "",
     valida: 0,
     validaMensaje: [],
     adModal: 0,
@@ -232,8 +248,8 @@ export default {
 
   methods: {
     listar() {
-      let header = {'Token': this.$store.state.token};
-      let configuracion = {headers: header};
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
       axios
         .get("usuario/list", configuracion)
         .then((response) => {
@@ -264,17 +280,13 @@ export default {
     validar() {
       this.valida = 0;
       this.validaMensaje = [];
-      if(!this.rol){
-         this.validaMensaje.push(
-          "Seleccione un rol."
-        ); 
+      if (!this.rol) {
+        this.validaMensaje.push("Seleccione un rol.");
       }
       if (this.nombre.length < 1 || this.nombre.length > 50) {
-        this.validaMensaje.push(
-          "El nombre debe tener entre 1-50 caracteres."
-        );
+        this.validaMensaje.push("El nombre debe tener entre 1-50 caracteres.");
       }
-      if ( this.num_documento.length > 20) {
+      if (this.num_documento.length > 20) {
         this.validaMensaje.push(
           "El numero del documento no debe tener mas de 20 caracteres."
         );
@@ -290,11 +302,9 @@ export default {
         );
       }
       if (this.email.length < 1 || this.email.length > 50) {
-        this.validaMensaje.push(
-          "El email debe tener entre 1-50 caracteres."
-        );
+        this.validaMensaje.push("El email debe tener entre 1-50 caracteres.");
       }
-      if (this.password.length < 1 || this.password.length > 50) {
+      if (this.password.length < 1 || this.password.length > 64) {
         this.validaMensaje.push(
           "El password debe tener entre 1-50 caracteres."
         );
@@ -306,8 +316,8 @@ export default {
     },
 
     guardar() {
-      let header = {'Token': this.$store.state.token};
-      let configuracion = {headers: header};
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
 
       if (this.validar()) {
         return;
@@ -315,18 +325,21 @@ export default {
 
       if (this.editedIndex > -1) {
         axios
-          .put("usuario/update", {
-            _id: this._id,
-            nombre: this.nombre,
-            rol: this.rol,
-            tipo_documento: this.tipo_documento,
-            num_documento: this.num_documento,
-            direccion: this.direccion,
-            telefono: this.telefono,
-            email: this.email,
-            password: this.password,
-          }, 
-          configuracion)
+          .put(
+            "usuario/update",
+            {
+              _id: this._id,
+              nombre: this.nombre,
+              rol: this.rol,
+              tipo_documento: this.tipo_documento,
+              num_documento: this.num_documento,
+              direccion: this.direccion,
+              telefono: this.telefono,
+              email: this.email,
+              password: this.password,
+            },
+            configuracion
+          )
           .then((response) => {
             this.limpiar();
             this.close();
@@ -337,17 +350,20 @@ export default {
           });
       } else {
         axios
-          .post("usuario/add", {
-            nombre: this.nombre,
-            rol: this.rol,
-            tipo_documento: this.tipo_documento,
-            num_documento: this.num_documento,
-            direccion: this.direccion,
-            telefono: this.telefono,
-            email: this.email,
-            password: this.password,
-          },
-          configuracion)
+          .post(
+            "usuario/add",
+            {
+              nombre: this.nombre,
+              rol: this.rol,
+              tipo_documento: this.tipo_documento,
+              num_documento: this.num_documento,
+              direccion: this.direccion,
+              telefono: this.telefono,
+              email: this.email,
+              password: this.password,
+            },
+            configuracion
+          )
           .then((response) => {
             this.limpiar();
             this.close();
@@ -362,7 +378,13 @@ export default {
     editItem(item) {
       this._id = item._id;
       this.nombre = item.nombre;
-      this.descripcion = item.descripcion;
+      this.rol = item.rol;
+      this.tipo_documento = item.tipo_documento;
+      this.num_documento = item.num_documento;
+      this.direccion = item.direccion;
+      this.telefono = item.telefono;
+      this.email = item.email;
+      this.password = item.password;
       this.dialog = true;
       this.editedIndex = 1;
     },
@@ -381,14 +403,17 @@ export default {
     },
 
     activar() {
-      let header = {'Token': this.$store.state.token};
-      let configuracion = {headers: header};
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
 
       axios
-        .put("usuario/activate", {
-          _id: this._id
-        },
-        configuracion)
+        .put(
+          "usuario/activate",
+          {
+            _id: this._id,
+          },
+          configuracion
+        )
         .then((response) => {
           this.limpiar();
           this.close();
@@ -400,14 +425,17 @@ export default {
     },
 
     desactivar() {
-      let header = {'Token': this.$store.state.token};
-      let configuracion = {headers: header};
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
 
       axios
-        .put("usuario/deactivate", {
-          _id: this._id
-        },
-        configuracion)
+        .put(
+          "usuario/deactivate",
+          {
+            _id: this._id,
+          },
+          configuracion
+        )
         .then((response) => {
           this.limpiar();
           this.close();
@@ -418,7 +446,7 @@ export default {
         });
     },
 
-    cerrar(){
+    cerrar() {
       this.adModal = 0;
     },
 
