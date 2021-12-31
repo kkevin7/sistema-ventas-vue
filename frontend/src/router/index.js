@@ -5,6 +5,7 @@ import store from '../store';
 //Components
 import Categoria from '../components/Categoria.vue';
 import Login from '../components/Login.vue';
+import Usuario from '../components/Usuario.vue'
 
 Vue.use(VueRouter)
 
@@ -36,6 +37,14 @@ let routes = [
       almacenero: true
     }
   },
+  {
+    path: '/usuario',
+    name: 'usuario',
+    component: Usuario,
+    meta: {
+      administrador: true,
+    },
+  },
 ];
 
 const router = new VueRouter({
@@ -45,22 +54,22 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.libre)){
+  if (to.matched.some(record => record.meta.libre)) {
     next();
-  } else if ( store.state.usuario && store.state.usuario.rol == 'Administrador'){
-    if (to.matched.some(record => record.meta.administrador)){
+  } else if (store.state.usuario && store.state.usuario.rol == 'Administrador') {
+    if (to.matched.some(record => record.meta.administrador)) {
       next();
     }
-  } else if ( store.state.usuario && store.state.usuario.rol == 'Vendedor'){
-    if (to.matched.some(record => record.meta.vendedor)){
+  } else if (store.state.usuario && store.state.usuario.rol == 'Vendedor') {
+    if (to.matched.some(record => record.meta.vendedor)) {
       next();
     }
-  } else if ( store.state.usuario && store.state.usuario.rol == 'Almacenero'){
-    if (to.matched.some(record => record.meta.almacenero)){
+  } else if (store.state.usuario && store.state.usuario.rol == 'Almacenero') {
+    if (to.matched.some(record => record.meta.almacenero)) {
       next();
     }
-  } else{
-    next({name: 'login'});
+  } else {
+    next({ name: 'login' });
   }
 });
 
