@@ -3,7 +3,7 @@
     <v-flex>
       <v-data-table
         :headers="headers"
-        :items="usuarios"
+        :items="articulos"
         :search="search"
         sort-by="nombre"
         class="elevation-1"
@@ -19,7 +19,7 @@
 
         <template v-slot:top>
           <v-toolbar flat>
-            <v-toolbar-title>Usuarios</v-toolbar-title>
+            <v-toolbar-title>Articulos</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
             <v-text-field
@@ -41,7 +41,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  Nueva Usuario
+                  Nueva Articulo
                 </v-btn>
               </template>
               <v-card>
@@ -52,56 +52,16 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
-                      <v-col cols="12" sm="6" md="6">
+                      <v-col cols="12" sm="12" md="12">
                         <v-text-field
                           v-model="nombre"
                           label="Nombre"
                         ></v-text-field>
                       </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-select
-                          v-model="rol"
-                          :items="roles"
-                          label="Rol"
-                        ></v-select>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-select
-                          v-model="tipo_documento"
-                          :items="documentos"
-                          label="Tipo Documento"
-                        ></v-select>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
+                      <v-col cols="12" sm="12" md="12">
                         <v-text-field
-                          v-model="num_documento"
-                          label="Numero Documento"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          v-model="direccion"
-                          label="Direccion"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          v-model="telefono"
-                          label="Telefono"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          type="email"
-                          v-model="email"
-                          label="Email"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          type="password"
-                          v-model="password"
-                          label="Password"
+                          v-model="descripcion"
+                          label="Descripcion"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="12" md="12" v-show="valida">
@@ -144,25 +104,9 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="green darken-1" text @click="cerrar()">
-                    Cancelar
-                  </v-btn>
-                  <v-btn
-                    color="orange darken-1"
-                    text
-                    @click="activar()"
-                    v-if="adAccion === 1"
-                  >
-                    Activar
-                  </v-btn>
-                  <v-btn
-                    color="orange darken-4"
-                    text
-                    @click="desactivar()"
-                    v-if="adAccion === 2"
-                  >
-                    Desactivar
-                  </v-btn>
+                  <v-btn color="green darken-1" text @click="cerrar()"> Cancelar </v-btn>
+                  <v-btn color="orange darken-1" text @click="activar()" v-if="adAccion===1"> Activar </v-btn>
+                  <v-btn color="orange darken-4" text @click="desactivar()" v-if="adAccion===2"> Desactivar </v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -193,32 +137,23 @@ import axios from "axios";
 export default {
   data: () => ({
     search: "",
-    usuarios: [],
+    articulos: [],
     dialog: false,
     dialogDelete: false,
     headers: [
+      { text: "Codigo", value: "codigo", sortable: true },
       { text: "Nombre", value: "nombre", sortable: true },
-      { text: "Rol", value: "rol", sortable: true },
-      { text: "Tipo Documento", value: "tipo_documento", sortable: true },
-      { text: "Numero Documento", value: "num_documento", sortable: true },
-      { text: "Direccion", value: "direccion", sortable: true },
-      { text: "Telefono", value: "telefono", sortable: true },
-      { text: "Email", value: "email", sortable: true },
-      { text: "Estado", value: "estado", sortable: true },
+      { text: "Categoria", value: "categoria.nombre", sortable: true },
+      { text: "Stock", value: "stock", sortable: true },
+      { text: "Precio Venta", value: "precio_venta", sortable: true },
+      { text: "Descripcion", value: "descripcion", sortable: true },
+      { text: "Estado", value: "estado", sortable: false },
       { text: "Actions", value: "actions", sortable: false },
     ],
     editedIndex: -1,
     _id: "",
     nombre: "",
-    rol: "",
-    roles: ["Administrador", "Almacenero", "Vendedor"],
-    tipo_documento: "",
-    documentos: ["DUI","DNI","NIT","RUC", "PASAPORTE", "CEDULA"],
-    num_documento: "",
-    direccion: "",
-    telefono: "",
-    email: "",
-    password: "",
+    descripcion: "",
     valida: 0,
     validaMensaje: [],
     adModal: 0,
@@ -248,12 +183,12 @@ export default {
 
   methods: {
     listar() {
-      let header = { Token: this.$store.state.token };
-      let configuracion = { headers: header };
+      let header = {'Token': this.$store.state.token};
+      let configuracion = {headers: header};
       axios
-        .get("usuario/list", configuracion)
+        .get("articulo/list", configuracion)
         .then((response) => {
-          this.usuarios = response.data;
+          this.articulos = response.data;
         })
         .catch((error) => {
           console.log(error);
@@ -263,14 +198,7 @@ export default {
     limpiar() {
       this._id = "";
       this.nombre = "";
-      this.rol = "";
-      this.tipo_documento = "";
-      this.num_documento = "";
-      this.direccion = "";
-      this.telefono = "";
-      this.email = "";
-      this.password = "";
-
+      this.descripcion = "";
       this.valida = 0;
       this.validaMensaje = [];
       this.editedIndex = -1;
@@ -280,33 +208,14 @@ export default {
     validar() {
       this.valida = 0;
       this.validaMensaje = [];
-      if (!this.rol) {
-        this.validaMensaje.push("Seleccione un rol.");
-      }
       if (this.nombre.length < 1 || this.nombre.length > 50) {
-        this.validaMensaje.push("El nombre debe tener entre 1-50 caracteres.");
-      }
-      if (this.num_documento.length > 20) {
         this.validaMensaje.push(
-          "El numero del documento no debe tener mas de 20 caracteres."
+          "El nombre de la categoria debe tener entre 1-50 caracteres."
         );
       }
-      if (this.direccion.length > 70) {
+      if (this.descripcion.length > 255) {
         this.validaMensaje.push(
-          "La direccion no debe tener mas de 70 caracteres."
-        );
-      }
-      if (this.telefono.length > 20) {
-        this.validaMensaje.push(
-          "El telefono no debe tener mas de 70 caracteres."
-        );
-      }
-      if (this.email.length < 1 || this.email.length > 50) {
-        this.validaMensaje.push("El email debe tener entre 1-50 caracteres.");
-      }
-      if (this.password.length < 1 || this.password.length > 64) {
-        this.validaMensaje.push(
-          "El password debe tener entre 1-50 caracteres."
+          "La descripcion de la categoria no debe tener mas de 255 caracteres."
         );
       }
       if (this.validaMensaje.length) {
@@ -316,8 +225,8 @@ export default {
     },
 
     guardar() {
-      let header = { Token: this.$store.state.token };
-      let configuracion = { headers: header };
+      let header = {'Token': this.$store.state.token};
+      let configuracion = {headers: header};
 
       if (this.validar()) {
         return;
@@ -325,21 +234,12 @@ export default {
 
       if (this.editedIndex > -1) {
         axios
-          .put(
-            "usuario/update",
-            {
-              _id: this._id,
-              nombre: this.nombre,
-              rol: this.rol,
-              tipo_documento: this.tipo_documento,
-              num_documento: this.num_documento,
-              direccion: this.direccion,
-              telefono: this.telefono,
-              email: this.email,
-              password: this.password,
-            },
-            configuracion
-          )
+          .put("articulo/update", {
+            _id: this._id,
+            nombre: this.nombre,
+            descripcion: this.descripcion,
+          }, 
+          configuracion)
           .then((response) => {
             this.limpiar();
             this.close();
@@ -350,20 +250,11 @@ export default {
           });
       } else {
         axios
-          .post(
-            "usuario/add",
-            {
-              nombre: this.nombre,
-              rol: this.rol,
-              tipo_documento: this.tipo_documento,
-              num_documento: this.num_documento,
-              direccion: this.direccion,
-              telefono: this.telefono,
-              email: this.email,
-              password: this.password,
-            },
-            configuracion
-          )
+          .post("articulo/add", {
+            nombre: this.nombre,
+            descripcion: this.descripcion,
+          },
+          configuracion)
           .then((response) => {
             this.limpiar();
             this.close();
@@ -378,13 +269,7 @@ export default {
     editItem(item) {
       this._id = item._id;
       this.nombre = item.nombre;
-      this.rol = item.rol;
-      this.tipo_documento = item.tipo_documento;
-      this.num_documento = item.num_documento;
-      this.direccion = item.direccion;
-      this.telefono = item.telefono;
-      this.email = item.email;
-      this.password = item.password;
+      this.descripcion = item.descripcion;
       this.dialog = true;
       this.editedIndex = 1;
     },
@@ -403,17 +288,14 @@ export default {
     },
 
     activar() {
-      let header = { Token: this.$store.state.token };
-      let configuracion = { headers: header };
+      let header = {'Token': this.$store.state.token};
+      let configuracion = {headers: header};
 
       axios
-        .put(
-          "usuario/activate",
-          {
-            _id: this._id,
-          },
-          configuracion
-        )
+        .put("articulo/activate", {
+          _id: this._id
+        },
+        configuracion)
         .then((response) => {
           this.limpiar();
           this.close();
@@ -425,17 +307,14 @@ export default {
     },
 
     desactivar() {
-      let header = { Token: this.$store.state.token };
-      let configuracion = { headers: header };
+      let header = {'Token': this.$store.state.token};
+      let configuracion = {headers: header};
 
       axios
-        .put(
-          "usuario/deactivate",
-          {
-            _id: this._id,
-          },
-          configuracion
-        )
+        .put("articulo/deactivate", {
+          _id: this._id
+        },
+        configuracion)
         .then((response) => {
           this.limpiar();
           this.close();
@@ -446,7 +325,7 @@ export default {
         });
     },
 
-    cerrar() {
+    cerrar(){
       this.adModal = 0;
     },
 
