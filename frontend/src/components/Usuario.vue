@@ -52,16 +52,56 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
-                      <v-col cols="12" sm="12" md="12">
+                      <v-col cols="12" sm="6" md="6">
                         <v-text-field
                           v-model="nombre"
                           label="Nombre"
                         ></v-text-field>
                       </v-col>
-                      <v-col cols="12" sm="12" md="12">
+                      <v-col cols="12" sm="6" md="6">
+                        <v-select 
+                        v-model="rol"
+                        :items="roles"
+                        label="Rol"
+                        ></v-select>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-select 
+                        v-model="tipo_documento"
+                        :items="documentos"
+                        label="Tipo Documento"
+                        ></v-select>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
                         <v-text-field
-                          v-model="descripcion"
-                          label="Descripcion"
+                          v-model="num_documento"
+                          label="Numero Documento"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field
+                          v-model="direccion"
+                          label="Direccion"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field
+                          v-model="telefono"
+                          label="Telefono"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field
+                          type="email"
+                          v-model="email"
+                          label="Email"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field
+                          type="password"
+                          v-model="password"
+                          label="Password"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="12" md="12" v-show="valida">
@@ -154,7 +194,15 @@ export default {
     editedIndex: -1,
     _id: "",
     nombre: "",
-    descripcion: "",
+    rol: '',
+    roles: ['Administrador','Almacenero','Vendedor'],
+    tipo_documento: "",
+    documentos: ['DNI', 'RUC', 'PASAPORTE', 'CEDULA'],
+    num_documento: '',
+    direccion: '',
+    telefono: '',
+    email: '',
+    password: '',
     valida: 0,
     validaMensaje: [],
     adModal: 0,
@@ -199,7 +247,14 @@ export default {
     limpiar() {
       this._id = "";
       this.nombre = "";
-      this.descripcion = "";
+      this.rol = "";
+      this.tipo_documento = "";
+      this.num_documento = "";
+      this.direccion = "";
+      this.telefono = "";
+      this.email = "";
+      this.password = "";
+
       this.valida = 0;
       this.validaMensaje = [];
       this.editedIndex = -1;
@@ -209,14 +264,39 @@ export default {
     validar() {
       this.valida = 0;
       this.validaMensaje = [];
+      if(!this.rol){
+         this.validaMensaje.push(
+          "Seleccione un rol."
+        ); 
+      }
       if (this.nombre.length < 1 || this.nombre.length > 50) {
         this.validaMensaje.push(
-          "El nombre de la categoria debe tener entre 1-50 caracteres."
+          "El nombre debe tener entre 1-50 caracteres."
         );
       }
-      if (this.descripcion.length > 255) {
+      if ( this.num_documento.length > 20) {
         this.validaMensaje.push(
-          "La descripcion de la categoria no debe tener mas de 255 caracteres."
+          "El numero del documento no debe tener mas de 20 caracteres."
+        );
+      }
+      if (this.direccion.length > 70) {
+        this.validaMensaje.push(
+          "La direccion no debe tener mas de 70 caracteres."
+        );
+      }
+      if (this.telefono.length > 20) {
+        this.validaMensaje.push(
+          "El telefono no debe tener mas de 70 caracteres."
+        );
+      }
+      if (this.email.length < 1 || this.email.length > 50) {
+        this.validaMensaje.push(
+          "El email debe tener entre 1-50 caracteres."
+        );
+      }
+      if (this.password.length < 1 || this.password.length > 50) {
+        this.validaMensaje.push(
+          "El password debe tener entre 1-50 caracteres."
         );
       }
       if (this.validaMensaje.length) {
@@ -238,7 +318,13 @@ export default {
           .put("usuario/update", {
             _id: this._id,
             nombre: this.nombre,
-            descripcion: this.descripcion,
+            rol: this.rol,
+            tipo_documento: this.tipo_documento,
+            num_documento: this.num_documento,
+            direccion: this.direccion,
+            telefono: this.telefono,
+            email: this.email,
+            password: this.password,
           }, 
           configuracion)
           .then((response) => {
@@ -253,7 +339,13 @@ export default {
         axios
           .post("usuario/add", {
             nombre: this.nombre,
-            descripcion: this.descripcion,
+            rol: this.rol,
+            tipo_documento: this.tipo_documento,
+            num_documento: this.num_documento,
+            direccion: this.direccion,
+            telefono: this.telefono,
+            email: this.email,
+            password: this.password,
           },
           configuracion)
           .then((response) => {
