@@ -52,10 +52,37 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field
+                          v-model="codigo"
+                          label="Codigo"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-select
+                          :items="categorias"
+                          v-model="categoria"
+                          label="Categoria"
+                        ></v-select>
+                      </v-col>
                       <v-col cols="12" sm="12" md="12">
                         <v-text-field
                           v-model="nombre"
                           label="Nombre"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field
+                          type="number"
+                          v-model="stock"
+                          label="Stock"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field
+                          type="number"
+                          v-model="precio_venta"
+                          label="Precio Venta"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="12" md="12">
@@ -151,9 +178,16 @@ export default {
       { text: "Actions", value: "actions", sortable: false },
     ],
     editedIndex: -1,
+
     _id: "",
+    codigo: "",
     nombre: "",
+    categoria: "",
+    categorias: [],
+    stock: 0,
+    precio_venta: 0,
     descripcion: "",
+
     valida: 0,
     validaMensaje: [],
     adModal: 0,
@@ -179,9 +213,27 @@ export default {
 
   created() {
     this.listar();
+    this.selectCategoria();
   },
 
   methods: {
+      selectCategoria(){
+      let header = {'Token': this.$store.state.token};
+      let categoriaArray = [];
+      let configuracion = {headers: header};
+      axios
+        .get("categoria/list", configuracion)
+        .then((response) => {
+          categoriaArray = response.data;
+          categoriaArray.map(cat => {
+              this.categorias.push({text: cat.nombre, value: cat._id});
+          })
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      },
+
     listar() {
       let header = {'Token': this.$store.state.token};
       let configuracion = {headers: header};
