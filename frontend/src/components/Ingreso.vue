@@ -213,6 +213,22 @@
                   <h3>No hay articulos agregados al detalle.</h3>
                 </template>
               </v-data-table>
+              <v-flex class="text-xs-right">
+                <strong>Total Parcial:</strong> $
+                {{ (totalParcial = (total - totalImpuesto).toFixed(2)) }}
+              </v-flex>
+              <v-flex class="text-xs-right">
+                <strong>Total Impuesto:</strong> $
+                {{
+                  (totalImpuesto = (
+                    (total * impuesto) /
+                    (1 + impuesto)
+                  ).toFixed(2))
+                }}
+              </v-flex>
+              <v-flex class="text-xs-right">
+                <strong>Total Neto:</strong> $ {{ (total = calcularTotal) }}
+              </v-flex>
             </template>
           </v-flex>
           <v-flex xs="12" sm="12" md="12" lg="12" xl="12" v-show="valida">
@@ -264,7 +280,7 @@ export default {
     tipo_comprobante: "",
     comprobantes: ["BOLETA", "FACTURA", "TICKET", "GUIA"],
     serie_comprobante: "",
-    impuesto: 18,
+    impuesto: 0.18,
     codigo: "",
     cabeceraDetalles: [
       { text: "Articulo", value: "articulo", sortable: false },
@@ -275,6 +291,10 @@ export default {
     ],
     detalles: [],
     verNuevo: 0,
+
+    total: 0,
+    totalParcial: 0,
+    totalImpuesto: 0,
 
     valida: 0,
     validaMensaje: [],
@@ -287,6 +307,14 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Nuevo Registro" : "Editar Registro";
+    },
+    calcularTotal: function () {
+      let resultado = 0.0;
+      for (let i = 0; i < this.detalles.length; i++) {
+        resultado =
+          resultado + this.detalles[i].cantidad * this.detalles[i].precio;
+      }
+      return resultado;
     },
   },
 
