@@ -7,6 +7,7 @@ import Categoria from '../components/Categoria.vue';
 import Login from '../components/Login.vue';
 import Usuario from '../components/Usuario.vue'
 import Articulo from '../components/Articulos.vue'
+import Cliente from '../components/Cliente.vue'
 
 Vue.use(VueRouter)
 
@@ -53,6 +54,15 @@ let routes = [
     meta: {
       administrador: true,
       almacenero: true
+    }
+  },
+  {
+    path: '/cliente',
+    name: 'cliente',
+    component: Cliente,
+    meta: {
+      administrador: true,
+      vendedor: true
     }
   },
 ];
