@@ -60,13 +60,6 @@
                       </v-col>
                       <v-col cols="12" sm="6" md="6">
                         <v-select
-                          v-model="rol"
-                          :items="roles"
-                          label="Rol"
-                        ></v-select>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-select
                           v-model="tipo_documento"
                           :items="documentos"
                           label="Tipo Documento"
@@ -95,13 +88,6 @@
                           type="email"
                           v-model="email"
                           label="Email"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          type="password"
-                          v-model="password"
-                          label="Password"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="12" md="12" v-show="valida">
@@ -198,7 +184,6 @@ export default {
     dialogDelete: false,
     headers: [
       { text: "Nombre", value: "nombre", sortable: true },
-      { text: "Rol", value: "rol", sortable: true },
       { text: "Tipo Persona", value: "tipo_persona", sortable: true },
       { text: "Numero Documento", value: "num_documento", sortable: true },
       { text: "Direccion", value: "direccion", sortable: true },
@@ -210,8 +195,7 @@ export default {
     editedIndex: -1,
     _id: "",
     nombre: "",
-    rol: "",
-    roles: ["Administrador", "Almacenero", "Vendedor"],
+    tipo_persona: "Cliente",
     tipo_documento: "",
     documentos: ["DUI","DNI","NIT","RUC", "PASAPORTE", "CEDULA"],
     num_documento: "",
@@ -263,13 +247,11 @@ export default {
     limpiar() {
       this._id = "";
       this.nombre = "";
-      this.rol = "";
       this.tipo_documento = "";
       this.num_documento = "";
       this.direccion = "";
       this.telefono = "";
       this.email = "";
-      this.password = "";
 
       this.valida = 0;
       this.validaMensaje = [];
@@ -280,8 +262,8 @@ export default {
     validar() {
       this.valida = 0;
       this.validaMensaje = [];
-      if (!this.rol) {
-        this.validaMensaje.push("Seleccione un rol.");
+      if (!this.tipo_persona) {
+        this.validaMensaje.push("Tipo persona no debe estar vacio.");
       }
       if (this.nombre.length < 1 || this.nombre.length > 50) {
         this.validaMensaje.push("El nombre debe tener entre 1-50 caracteres.");
@@ -301,13 +283,8 @@ export default {
           "El telefono no debe tener mas de 70 caracteres."
         );
       }
-      if (this.email.length < 1 || this.email.length > 50) {
-        this.validaMensaje.push("El email debe tener entre 1-50 caracteres.");
-      }
-      if (this.password.length < 1 || this.password.length > 64) {
-        this.validaMensaje.push(
-          "El password debe tener entre 1-50 caracteres."
-        );
+      if (this.email.length > 150) {
+        this.validaMensaje.push("El email debe tener entre 1-150 caracteres.");
       }
       if (this.validaMensaje.length) {
         this.valida = 1;
@@ -330,13 +307,12 @@ export default {
             {
               _id: this._id,
               nombre: this.nombre,
-              rol: this.rol,
+              tipo_persona: this.tipo_persona,
               tipo_documento: this.tipo_documento,
               num_documento: this.num_documento,
               direccion: this.direccion,
               telefono: this.telefono,
               email: this.email,
-              password: this.password,
             },
             configuracion
           )
@@ -354,13 +330,12 @@ export default {
             "persona/add",
             {
               nombre: this.nombre,
-              rol: this.rol,
+              tipo_persona: this.tipo_persona,
               tipo_documento: this.tipo_documento,
               num_documento: this.num_documento,
               direccion: this.direccion,
               telefono: this.telefono,
               email: this.email,
-              password: this.password,
             },
             configuracion
           )
@@ -378,13 +353,13 @@ export default {
     editItem(item) {
       this._id = item._id;
       this.nombre = item.nombre;
-      this.rol = item.rol;
+      this.tipo_persona = item.tipo_persona;
       this.tipo_documento = item.tipo_documento;
       this.num_documento = item.num_documento;
       this.direccion = item.direccion;
       this.telefono = item.telefono;
       this.email = item.email;
-      this.password = item.password;
+
       this.dialog = true;
       this.editedIndex = 1;
     },

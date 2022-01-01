@@ -301,8 +301,8 @@ export default {
           "El telefono no debe tener mas de 70 caracteres."
         );
       }
-      if (this.email.length < 1 || this.email.length > 50) {
-        this.validaMensaje.push("El email debe tener entre 1-50 caracteres.");
+      if (this.email.length < 1 || this.email.length > 150) {
+        this.validaMensaje.push("El email debe tener entre 1-150 caracteres.");
       }
       if (this.password.length < 1 || this.password.length > 64) {
         this.validaMensaje.push(
