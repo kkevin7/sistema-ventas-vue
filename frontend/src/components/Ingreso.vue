@@ -29,21 +29,22 @@
               label="Busqueda"
               single-line
               hide-details
+              v-if="verNuevo === 0"
             />
             <v-spacer></v-spacer>
 
+            <v-btn
+              color="primary"
+              dark
+              class="mb-2"
+              v-bind="attrs"
+              v-if="verNuevo === 0"
+              @click="mostrarNuevo()"
+            >
+              Nuevo Ingreso
+            </v-btn>
+
             <v-dialog v-model="dialog" max-width="500px">
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  color="primary"
-                  dark
-                  class="mb-2"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  Nuevo Ingreso
-                </v-btn>
-              </template>
               <v-card>
                 <v-card-title>
                   <span class="text-h5">{{ formTitle }}</span>
@@ -51,68 +52,7 @@
 
                 <v-card-text>
                   <v-container>
-                    <v-row>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          v-model="nombre"
-                          label="Nombre"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-select
-                          v-model="rol"
-                          :items="roles"
-                          label="Rol"
-                        ></v-select>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-select
-                          v-model="tipo_documento"
-                          :items="documentos"
-                          label="Tipo Documento"
-                        ></v-select>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          v-model="num_documento"
-                          label="Numero Documento"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          v-model="direccion"
-                          label="Direccion"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          v-model="telefono"
-                          label="Telefono"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          type="email"
-                          v-model="email"
-                          label="Email"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          type="password"
-                          v-model="password"
-                          label="Password"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="12" md="12" v-show="valida">
-                        <div
-                          class="red--text"
-                          v-for="v in validaMensaje"
-                          :key="v"
-                          v-text="v"
-                        ></div>
-                      </v-col>
-                    </v-row>
+                    <v-row> </v-row>
                   </v-container>
                 </v-card-text>
 
@@ -183,6 +123,101 @@
           <v-btn color="primary" @click="listar()"> Reset </v-btn>
         </template>
       </v-data-table>
+
+      <v-container grid-list-sm class="pa-4 mt-4 white" v-if="verNuevo">
+        <v-layout row wrap>
+          <v-flex xs12 sm4 md4 lg4 xl4>
+            <v-select
+              v-model="tipo_comprobante"
+              :items="comprobantes"
+              label="Tipo Comprobante"
+            >
+            </v-select>
+          </v-flex>
+          <v-flex xs12 sm4 md4 lg4 xl4>
+            <v-text-field v-model="serie_comprobante" label="Serie Comprobante">
+            </v-text-field>
+          </v-flex>
+          <v-flex xs12 sm4 md4 lg4 xl4>
+            <v-text-field v-model="num_comprobante" label="Número Comprobante">
+            </v-text-field>
+          </v-flex>
+          <v-flex xs12 sm8 md8 lg8 xl8>
+            <v-autocomplete
+              :items="personas"
+              v-model="persona"
+              label="Proveedor"
+            >
+            </v-autocomplete>
+          </v-flex>
+          <v-flex xs12 sm4 md4 lg4 xl4>
+            <v-text-field type="number" v-model="impuesto" label="Impuesto">
+            </v-text-field>
+          </v-flex>
+          <v-flex xs12 sm8 md8 lg8 x8>
+            <v-text-field
+              v-model="codigo"
+              label="Código"
+              @keyup.enter="buscarCodigo()"
+            >
+            </v-text-field>
+          </v-flex>
+          <v-flex xs12 sm2 md2 lg2 xl2>
+            <v-btn small fab dark color="teal" @click="mostrarModalArticulos()">
+              <v-icon dark>list</v-icon>
+            </v-btn>
+          </v-flex>
+          <v-flex xs12 sm2 md2 lg2 xl2 v-show="errorArticulo">
+            <div class="red--text" v-text="errorArticulo"></div>
+          </v-flex>
+
+          <v-flex xs12 sm12 md12 lg12 xl12>
+            <template>
+              <v-data-table
+                :headers="cabeceraDetalles"
+                :items="detalles"
+                hide-actions
+                class="elevation-1"
+              >
+                <template slot="items" slot-scope="props">
+                  <td class="text-xs-center">{{ props.item.articulo }}</td>
+                  <td class="text-xs-center">{{ props.item.cantidad }}</td>
+                  <td class="text-xs-center">{{ props.item.precio }}</td>
+                </template>
+                <template v-slot:[`item.subtotal`]="{ item }">
+                  <td class="text-xs-center">
+                    $ {{ item.cantidad * item.precio }}
+                  </td>
+                </template>
+                <template v-slot:[`item.borrar`]>
+                  <td>
+                    <v-icon small class="mr-2">delete</v-icon>
+                  </td>
+                </template>
+                <template slot="no-data">
+                  <h3>No hay articulos agregados al detalle.</h3>
+                </template>
+              </v-data-table>
+            </template>
+          </v-flex>
+          <v-flex xs="12" sm="12" md="12" lg="12" xl="12" v-show="valida">
+            <div
+              class="red--text"
+              v-for="v in validaMensaje"
+              :key="v"
+              v-text="v"
+            ></div>
+          </v-flex>
+          <v-flex xs="12" sm="12" md="12" lg="12" xl="12">
+            <v-btn color="blue darken-1" text @click.native="ocultarNuevo()"
+              >Cancelar</v-btn
+            >
+            <v-btn color="success" text @click.native="guardar()"
+              >Guardar</v-btn
+            >
+          </v-flex>
+        </v-layout>
+      </v-container>
     </v-flex>
   </v-layout>
 </template>
@@ -209,16 +244,26 @@ export default {
     ],
     editedIndex: -1,
     _id: "",
-    nombre: "",
-    rol: "",
-    roles: ["Administrador", "Almacenero", "Vendedor"],
-    tipo_documento: "",
-    documentos: ["DUI","DNI","NIT","RUC", "PASAPORTE", "CEDULA"],
-    num_documento: "",
-    direccion: "",
-    telefono: "",
-    email: "",
-    password: "",
+    persona: "",
+    personas: [],
+    tipo_comprobante: "",
+    comprobantes: ["BOLETA", "FACTURA", "TICKET", "GUIA"],
+    serie_comprobante: "",
+    impuesto: 18,
+    codigo: "",
+    cabeceraDetalles: [
+      { text: "Articulo", value: "articulo", sortable: false },
+      { text: "Cantidad", value: "cantidad", sortable: false },
+      { text: "Precio", value: "precio", sortable: false },
+      { text: "Sub Total", value: "subtotal", sortable: false },
+      { text: "Borrar", value: "borrar", sortable: false },
+    ],
+    detalles: [
+      { _id: "1000", articulo: "Articulo 1", cantidad: "5", precio: "10" },
+      { _id: "2000", articulo: "Articulo 2", cantidad: "7", precio: "10" },
+    ],
+    verNuevo: 0,
+
     valida: 0,
     validaMensaje: [],
     adModal: 0,
@@ -244,9 +289,27 @@ export default {
 
   created() {
     this.listar();
+    this.selectPersona();
   },
 
   methods: {
+    selectPersona() {
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
+      let personaArray = [];
+      axios
+        .get("categoria/list", configuracion)
+        .then((response) => {
+          personaArray = response.data;
+          personaArray.map((cat) => {
+            this.personas.push({ text: cat.nombre, value: cat._id });
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
     listar() {
       let header = { Token: this.$store.state.token };
       let configuracion = { headers: header };
@@ -313,6 +376,13 @@ export default {
         this.valida = 1;
       }
       return this.valida;
+    },
+
+    mostrarNuevo() {
+      this.verNuevo = 1;
+    },
+    ocultarNuevo() {
+      this.verNuevo = 0;
     },
 
     guardar() {
