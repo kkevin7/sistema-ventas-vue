@@ -5,9 +5,10 @@ import store from '../store';
 //Components
 import Categoria from '../components/Categoria.vue';
 import Login from '../components/Login.vue';
-import Usuario from '../components/Usuario.vue'
-import Articulo from '../components/Articulos.vue'
-import Cliente from '../components/Cliente.vue'
+import Usuario from '../components/Usuario.vue';
+import Articulo from '../components/Articulos.vue';
+import Cliente from '../components/Cliente.vue';
+import Proveedor from '../components/Proveedor.vue';
 
 Vue.use(VueRouter)
 
@@ -63,6 +64,15 @@ let routes = [
     meta: {
       administrador: true,
       vendedor: true
+    }
+  },
+  {
+    path: '/proveedor',
+    name: 'proveedor',
+    component: Proveedor,
+    meta: {
+      administrador: true,
+      proveedor: true
     }
   },
 ];

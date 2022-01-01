@@ -41,7 +41,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  Nueva Cliente
+                  Nuevo Cliente
                 </v-btn>
               </template>
               <v-card>

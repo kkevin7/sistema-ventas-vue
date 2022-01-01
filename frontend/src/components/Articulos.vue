@@ -41,7 +41,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  Nueva Articulo
+                  Nuevo Articulo
                 </v-btn>
               </template>
               <v-card>
