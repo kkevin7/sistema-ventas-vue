@@ -37,33 +37,72 @@
               color="primary"
               dark
               class="mb-2"
-              v-bind="attrs"
               v-if="verNuevo === 0"
               @click="mostrarNuevo()"
             >
               Nuevo Ingreso
             </v-btn>
 
-            <v-dialog v-model="dialog" max-width="500px">
+            <v-dialog v-model="dialog" max-width="1000px">
               <v-card>
                 <v-card-title>
-                  <span class="text-h5">{{ formTitle }}</span>
+                  <span class="headline">Seleccione un artículo</span>
                 </v-card-title>
-
                 <v-card-text>
-                  <v-container>
-                    <v-row> </v-row>
+                  <v-container grid-list-md>
+                    <v-layout wrap>
+                      <v-flex xs12 sm12 md12 lg12 xl12>
+                        <v-text-field
+                          v-model="texto"
+                          @keyup.enter="listarArticulos()"
+                          class="text-xs-center"
+                          append-icon="search"
+                          label="Búsqueda"
+                        ></v-text-field>
+                        <template>
+                          <v-data-table
+                            :headers="headerArticulos"
+                            :items="articulos"
+                            class="elevation-1"
+                          >
+                            <template v-slot:items="props">
+                              <td>{{ props.item.codigo }}</td>
+                              <td>{{ props.item.nombre }}</td>
+                              <td>{{ props.item.categoria.nombre }}</td>
+                              <td>{{ props.item.stock }}</td>
+                              <td>{{ props.item.precio_venta }}</td>
+                              <td>{{ props.item.descripcion }}</td>
+                              <td>
+                                <div v-if="props.item.estado">
+                                  <span class="blue--text">Activo</span>
+                                </div>
+                                <div v-else>
+                                  <span class="red--text">Inactivo</span>
+                                </div>
+                              </td>
+                            </template>
+                            <template v-slot:[`item.seleccionar`]="{ item }">
+                              <td class="justify-center layout px-0">
+                                <v-icon
+                                  small
+                                  class="mr-2"
+                                  @click="agregarDetalle(item)"
+                                >
+                                  add
+                                </v-icon>
+                              </td>
+                            </template>
+                          </v-data-table>
+                        </template>
+                      </v-flex>
+                    </v-layout>
                   </v-container>
                 </v-card-text>
-
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="blue darken-1" text @click="close"
                     >Cancelar</v-btn
                   >
-                  <v-btn color="blue darken-1" text @click="guardar">
-                    Guardar
-                  </v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -106,6 +145,7 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
+            
           </v-toolbar>
         </template>
 
@@ -213,22 +253,26 @@
                   <h3>No hay articulos agregados al detalle.</h3>
                 </template>
               </v-data-table>
-              <v-flex class="text-xs-right">
-                <strong>Total Parcial:</strong> $
-                {{ (totalParcial = (total - totalImpuesto).toFixed(2)) }}
+
+              <div class="w-100 my-4">
+                  <v-flex class="text-xs-right">
+                  <strong>Total Parcial:</strong> $
+                  {{ (totalParcial = (total - totalImpuesto).toFixed(2)) }}
+                </v-flex>
+                <v-flex class="text-xs-right">
+                  <strong>Total Impuesto:</strong> $
+                  {{
+                    (totalImpuesto = (
+                      (total * impuesto) /
+                      (1 + impuesto)
+                    ).toFixed(2))
+                  }}
+                </v-flex>
+                <v-flex class="text-xs-right">
+                  <strong>Total Neto:</strong> $ {{ (total = calcularTotal) }}
               </v-flex>
-              <v-flex class="text-xs-right">
-                <strong>Total Impuesto:</strong> $
-                {{
-                  (totalImpuesto = (
-                    (total * impuesto) /
-                    (1 + impuesto)
-                  ).toFixed(2))
-                }}
-              </v-flex>
-              <v-flex class="text-xs-right">
-                <strong>Total Neto:</strong> $ {{ (total = calcularTotal) }}
-              </v-flex>
+              </div>
+
             </template>
           </v-flex>
           <v-flex xs="12" sm="12" md="12" lg="12" xl="12" v-show="valida">
@@ -271,13 +315,14 @@ export default {
       { text: "Fecha", value: "createdAt", sortable: true },
       { text: "Impuesto", value: "impuesto", sortable: true },
       { text: "Total", value: "total", sortable: true },
+      { text: "Estado", value: "estado", sortable: false },
       { text: "Actions", value: "actions", sortable: false },
     ],
-    editedIndex: -1,
     _id: "",
     persona: "",
     personas: [],
     tipo_comprobante: "",
+    num_comprobante: '',
     comprobantes: ["BOLETA", "FACTURA", "TICKET", "GUIA"],
     serie_comprobante: "",
     impuesto: 0.18,
@@ -292,6 +337,19 @@ export default {
     detalles: [],
     verNuevo: 0,
 
+    articulos: [],
+    texto: "",
+    headerArticulos: [
+      { text: "Codigo", value: "codigo", sortable: true },
+      { text: "Nombre", value: "nombre", sortable: true },
+      { text: "Categoria", value: "categoria.nombre", sortable: true },
+      { text: "Stock", value: "stock", sortable: true },
+      { text: "Precio Venta", value: "precio_venta", sortable: true },
+      { text: "Descripcion", value: "descripcion", sortable: true },
+      { text: "Estado", value: "estado", sortable: false },
+      { text: "Seleccionar", value: "seleccionar", sortable: false },
+    ],
+
     total: 0,
     totalParcial: 0,
     totalImpuesto: 0,
@@ -305,9 +363,6 @@ export default {
   }),
 
   computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? "Nuevo Registro" : "Editar Registro";
-    },
     calcularTotal: function () {
       let resultado = 0.0;
       for (let i = 0; i < this.detalles.length; i++) {
@@ -329,6 +384,7 @@ export default {
 
   created() {
     this.listar();
+    this.listarArticulos();
     this.selectPersona();
   },
 
@@ -338,7 +394,7 @@ export default {
       let configuracion = { headers: header };
       let personaArray = [];
       axios
-        .get("categoria/list", configuracion)
+        .get("persona/list", configuracion)
         .then((response) => {
           personaArray = response.data;
           personaArray.map((cat) => {
@@ -409,16 +465,31 @@ export default {
         });
     },
 
+    listarArticulos() {
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
+      axios
+        .get("articulo/list?valor=" + this.texto, configuracion)
+        .then((response) => {
+          this.articulos = response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
     limpiar() {
       this._id = "";
-      this.nombre = "";
-      this.rol = "";
-      this.tipo_documento = "";
-      this.num_documento = "";
-      this.direccion = "";
-      this.telefono = "";
-      this.email = "";
-      this.password = "";
+      this.tipo_comprobante = "";
+      this.serie_comprobante = "";
+      this.num_comprobante = "";
+      this.impuesto = 0.18;
+      this.codigo = "";
+      this.total = 0;
+      this.totalParcial = 0;
+      this.totalImpuesto = 0;
+      this.detalles = [];
+      this.verNuevo = 0;
 
       this.valida = 0;
       this.validaMensaje = [];
@@ -429,34 +500,20 @@ export default {
     validar() {
       this.valida = 0;
       this.validaMensaje = [];
-      if (!this.rol) {
-        this.validaMensaje.push("Seleccione un rol.");
+      if (!this.persona) {
+        this.validaMensaje.push("Seleccione un proveedor.");
       }
-      if (this.nombre.length < 1 || this.nombre.length > 50) {
-        this.validaMensaje.push("El nombre debe tener entre 1-50 caracteres.");
+      if (!this.tipo_comprobante) {
+        this.validaMensaje.push("Seleccione un tipo de comprobante.");
       }
-      if (this.num_documento.length > 20) {
-        this.validaMensaje.push(
-          "El numero del documento no debe tener mas de 20 caracteres."
-        );
+      if (!this.num_comprobante) {
+        this.validaMensaje.push("Ingrese el numero de comprobante.");
       }
-      if (this.direccion.length > 70) {
-        this.validaMensaje.push(
-          "La direccion no debe tener mas de 70 caracteres."
-        );
+      if (!this.impuesto || this.impuesto < 0 || this.impuesto > 1) {
+        this.validaMensaje.push("Ingrese un impuesto valido.");
       }
-      if (this.telefono.length > 20) {
-        this.validaMensaje.push(
-          "El telefono no debe tener mas de 70 caracteres."
-        );
-      }
-      if (this.email.length < 1 || this.email.length > 150) {
-        this.validaMensaje.push("El email debe tener entre 1-150 caracteres.");
-      }
-      if (this.password.length < 1 || this.password.length > 64) {
-        this.validaMensaje.push(
-          "El password debe tener entre 1-50 caracteres."
-        );
+      if (this.detalles.length <= 0) {
+        this.validaMensaje.push("Ingrese al menos un articulo al detalle.");
       }
       if (this.validaMensaje.length) {
         this.valida = 1;
@@ -479,70 +536,33 @@ export default {
         return;
       }
 
-      if (this.editedIndex > -1) {
-        axios
-          .put(
-            "ingreso/update",
-            {
-              _id: this._id,
-              nombre: this.nombre,
-              rol: this.rol,
-              tipo_documento: this.tipo_documento,
-              num_documento: this.num_documento,
-              direccion: this.direccion,
-              telefono: this.telefono,
-              email: this.email,
-              password: this.password,
-            },
-            configuracion
-          )
-          .then((response) => {
-            this.limpiar();
-            this.close();
-            this.listar();
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } else {
-        axios
-          .post(
-            "ingreso/add",
-            {
-              nombre: this.nombre,
-              rol: this.rol,
-              tipo_documento: this.tipo_documento,
-              num_documento: this.num_documento,
-              direccion: this.direccion,
-              telefono: this.telefono,
-              email: this.email,
-              password: this.password,
-            },
-            configuracion
-          )
-          .then((response) => {
-            this.limpiar();
-            this.close();
-            this.listar();
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
+      axios
+        .post(
+          "ingreso/add",
+          {
+            persona: this.persona,
+            usuario: this.$store.state.usuario._id,
+            tipo_comprobante: this.tipo_comprobante,
+            num_comprobante: this.num_comprobante,
+            serie_comprobante: this.serie_comprobante,
+            impuesto: this.impuesto,
+            total: this.total,
+            detalles: this.detalles,
+          },
+          configuracion
+        )
+        .then((response) => {
+          this.limpiar();
+          this.close();
+          this.listar();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
-    editItem(item) {
-      this._id = item._id;
-      this.nombre = item.nombre;
-      this.rol = item.rol;
-      this.tipo_documento = item.tipo_documento;
-      this.num_documento = item.num_documento;
-      this.direccion = item.direccion;
-      this.telefono = item.telefono;
-      this.email = item.email;
-      this.password = item.password;
-      this.dialog = true;
-      this.editedIndex = 1;
+    mostrarModalArticulos() {
+      this.dialog = 1;
     },
 
     toogleActivate(action, item) {

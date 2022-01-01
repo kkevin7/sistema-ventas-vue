@@ -370,8 +370,8 @@ export default {
       this.codigo= item.codigo,
       this.nombre= item.nombre,
       this.categoria= item.categoria,
-      this.stock= 0,
-      this.precio_venta= 0,
+      this.stock= item.stock,
+      this.precio_venta= item.precio_venta,
       this.descripcion= item.descripcion,
 
       this.dialog = true;

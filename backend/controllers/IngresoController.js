@@ -94,7 +94,7 @@ export default {
     */
     activate: async (req, res, next) => {
         try {
-            const reg = await models.Venta.findByIdAndUpdate({ _id: req.body._id }, { estado: 1 });
+            const reg = await models.Ingreso.findByIdAndUpdate({ _id: req.body._id }, { estado: 1 });
             //Actualizar stock
             let detalles = reg.detalles;
             detalles.map(function (x) {
@@ -110,7 +110,7 @@ export default {
     },
     deactivate: async (req, res, next) => {
         try {
-            const reg = await models.Venta.findByIdAndUpdate({ _id: req.body._id }, { estado: 0 });
+            const reg = await models.Ingreso.findByIdAndUpdate({ _id: req.body._id }, { estado: 0 });
             //Actualizar stock
             let detalles = reg.detalles;
             detalles.map(function (x) {
