@@ -10,6 +10,7 @@ import Articulo from '../components/Articulos.vue';
 import Cliente from '../components/Cliente.vue';
 import Proveedor from '../components/Proveedor.vue';
 import Ingreso from '../components/Ingreso.vue';
+import Venta from  '../components/Venta.vue';
 
 Vue.use(VueRouter)
 
@@ -83,6 +84,15 @@ let routes = [
     meta: {
       administrador: true,
       almacenero: true
+    }
+  },
+  {
+    path: '/venta',
+    name: 'venta',
+    component: Venta,
+    meta: {
+      administrador: true,
+      vendedor: true
     }
   },
 ];

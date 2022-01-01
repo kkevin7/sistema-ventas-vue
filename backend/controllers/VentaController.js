@@ -50,15 +50,15 @@ export default {
     list: async (req, res, next) => {
         try {
             let valor = req.query.valor;
-            const reg = await models.Categoria
-                .find({ $or: [{ 'num_comprobante': new RegExp(valor, 'i') }, { 'serie_comprobantre': new RegExp(valor, 'i') }] })
+            const reg = await models.Venta
+                .find({ $or: [{ 'num_comprobante': new RegExp(valor, 'i') }, { 'serie_comprobante': new RegExp(valor, 'i') }] })
                 .populate('usuario', { nombre: 1 })
                 .populate('persona', { nombre: 1 })
-                .sort({ 'createAt': -1 });
+                .sort({ 'createdAt': -1 });
             res.status(200).json(reg);
         } catch (e) {
             res.status(500).send({
-                message: 'Ocurrio un error'
+                message: 'Ocurrió un error'
             });
             next(e);
         }
