@@ -18,8 +18,13 @@
         </template>
 
         <template v-slot:top>
-          <v-toolbar flat>
+          <v-toolbar flat color="white">
             <v-toolbar-title>Articulos</v-toolbar-title>
+
+            <v-btn class="ml-2" @click="crearPDF()">
+              <v-icon>print</v-icon>
+            </v-btn>
+
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
             <v-text-field
@@ -176,6 +181,8 @@
 
 <script>
 import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default {
   data: () => ({
@@ -233,6 +240,36 @@ export default {
   },
 
   methods: {
+    crearPDF() {
+      var columns = [
+        { title: "Nombre", dataKey: "nombre" },
+        { title: "Código", dataKey: "codigo" },
+        { title: "Categoría", dataKey: "categoria" },
+        { title: "Stock", dataKey: "stock" },
+        { title: "Precio Venta", dataKey: "precio_venta" },
+      ];
+      var rows = [];
+
+      this.articulos.map(function (x) {
+        rows.push({
+          nombre: x.nombre,
+          codigo: x.codigo,
+          categoria: x.categoria.nombre,
+          stock: x.stock,
+          precio_venta: x.precio_venta,
+        });
+      });
+      
+      var doc = new jsPDF("p", "pt");
+      doc.autoTable(columns, rows, {
+        margin: { top: 60 },
+        addPageContent: function (data) {
+          doc.text("Lista de Artículos", 40, 30);
+        },
+      });
+      doc.save("Articulos.pdf");
+    },
+
     selectCategoria() {
       let header = { Token: this.$store.state.token };
       let categoriaArray = [];
@@ -265,13 +302,13 @@ export default {
 
     limpiar() {
       this._id = "";
-      this.codigo= "",
-      this.nombre= "",
-      this.categoria= "",
-      this.stock= 0,
-      this.precio_venta= 0,
-      this.descripcion= "",
-      
+      this.codigo = "";
+      this.nombre = "";
+      this.categoria = "";
+      this.stock = 0;
+      this.precio_venta = 0;
+      this.descripcion = "";
+
       this.valida = 0;
       this.validaMensaje = [];
       this.editedIndex = -1;
@@ -367,12 +404,12 @@ export default {
 
     editItem(item) {
       this._id = item._id;
-      this.codigo= item.codigo,
-      this.nombre= item.nombre,
-      this.categoria= item.categoria,
-      this.stock= item.stock,
-      this.precio_venta= item.precio_venta,
-      this.descripcion= item.descripcion,
+      this.codigo = item.codigo;
+      this.nombre = item.nombre;
+      this.categoria = item.categoria;
+      this.stock = item.stock;
+      this.precio_venta = item.precio_venta;
+      this.descripcion = item.descripcion;
 
       this.dialog = true;
       this.editedIndex = 1;

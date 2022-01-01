@@ -145,7 +145,7 @@
     >
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-        <span class="hidden-sm-and-down">System VueJS</span>
+        <span class="hidden-sm-and-down">Sistema Ventas</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn v-if="logueado" @click="salir()" icon >
