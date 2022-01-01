@@ -131,9 +131,25 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="green darken-1" text @click="cerrar()"> Cancelar </v-btn>
-                  <v-btn color="orange darken-1" text @click="activar()" v-if="adAccion===1"> Activar </v-btn>
-                  <v-btn color="orange darken-4" text @click="desactivar()" v-if="adAccion===2"> Desactivar </v-btn>
+                  <v-btn color="green darken-1" text @click="cerrar()">
+                    Cancelar
+                  </v-btn>
+                  <v-btn
+                    color="orange darken-1"
+                    text
+                    @click="activar()"
+                    v-if="adAccion === 1"
+                  >
+                    Activar
+                  </v-btn>
+                  <v-btn
+                    color="orange darken-4"
+                    text
+                    @click="desactivar()"
+                    v-if="adAccion === 2"
+                  >
+                    Desactivar
+                  </v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -217,26 +233,26 @@ export default {
   },
 
   methods: {
-      selectCategoria(){
-      let header = {'Token': this.$store.state.token};
+    selectCategoria() {
+      let header = { Token: this.$store.state.token };
       let categoriaArray = [];
-      let configuracion = {headers: header};
+      let configuracion = { headers: header };
       axios
         .get("categoria/list", configuracion)
         .then((response) => {
           categoriaArray = response.data;
-          categoriaArray.map(cat => {
-              this.categorias.push({text: cat.nombre, value: cat._id});
-          })
+          categoriaArray.map((cat) => {
+            this.categorias.push({ text: cat.nombre, value: cat._id });
+          });
         })
         .catch((error) => {
           console.log(error);
         });
-      },
+    },
 
     listar() {
-      let header = {'Token': this.$store.state.token};
-      let configuracion = {headers: header};
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
       axios
         .get("articulo/list", configuracion)
         .then((response) => {
@@ -249,8 +265,13 @@ export default {
 
     limpiar() {
       this._id = "";
-      this.nombre = "";
-      this.descripcion = "";
+      this.codigo= "",
+      this.nombre= "",
+      this.categoria= "",
+      this.stock= 0,
+      this.precio_venta= 0,
+      this.descripcion= "",
+      
       this.valida = 0;
       this.validaMensaje = [];
       this.editedIndex = -1;
@@ -261,14 +282,26 @@ export default {
       this.valida = 0;
       this.validaMensaje = [];
       if (this.nombre.length < 1 || this.nombre.length > 50) {
+        this.validaMensaje.push("El nombre debe tener entre 1-50 caracteres.");
+      }
+      if (!this.categoria) {
+        this.validaMensaje.push("Selecione una categoria.");
+      }
+      if (this.codigo.length > 34) {
         this.validaMensaje.push(
-          "El nombre de la categoria debe tener entre 1-50 caracteres."
+          "El codigo no debe tener mas de 64 caracteres."
         );
       }
       if (this.descripcion.length > 255) {
         this.validaMensaje.push(
-          "La descripcion de la categoria no debe tener mas de 255 caracteres."
+          "La descripcion no debe tener mas de 255 caracteres."
         );
+      }
+      if (this.stock < 0) {
+        this.validaMensaje.push("Ingrese un stock valido.");
+      }
+      if (this.stock < 0) {
+        this.validaMensaje.push("Ingrese un precio de venta valido.");
       }
       if (this.validaMensaje.length) {
         this.valida = 1;
@@ -277,8 +310,8 @@ export default {
     },
 
     guardar() {
-      let header = {'Token': this.$store.state.token};
-      let configuracion = {headers: header};
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
 
       if (this.validar()) {
         return;
@@ -286,12 +319,19 @@ export default {
 
       if (this.editedIndex > -1) {
         axios
-          .put("articulo/update", {
-            _id: this._id,
-            nombre: this.nombre,
-            descripcion: this.descripcion,
-          }, 
-          configuracion)
+          .put(
+            "articulo/update",
+            {
+              _id: this._id,
+              codigo: this.codigo,
+              nombre: this.nombre,
+              categoria: this.categoria,
+              stock: this.stock,
+              precio_venta: this.precio_venta,
+              descripcion: this.descripcion,
+            },
+            configuracion
+          )
           .then((response) => {
             this.limpiar();
             this.close();
@@ -302,11 +342,18 @@ export default {
           });
       } else {
         axios
-          .post("articulo/add", {
-            nombre: this.nombre,
-            descripcion: this.descripcion,
-          },
-          configuracion)
+          .post(
+            "articulo/add",
+            {
+              codigo: this.codigo,
+              nombre: this.nombre,
+              categoria: this.categoria,
+              stock: this.stock,
+              precio_venta: this.precio_venta,
+              descripcion: this.descripcion,
+            },
+            configuracion
+          )
           .then((response) => {
             this.limpiar();
             this.close();
@@ -320,8 +367,13 @@ export default {
 
     editItem(item) {
       this._id = item._id;
-      this.nombre = item.nombre;
-      this.descripcion = item.descripcion;
+      this.codigo= item.codigo,
+      this.nombre= item.nombre,
+      this.categoria= item.categoria,
+      this.stock= 0,
+      this.precio_venta= 0,
+      this.descripcion= item.descripcion,
+
       this.dialog = true;
       this.editedIndex = 1;
     },
@@ -340,14 +392,17 @@ export default {
     },
 
     activar() {
-      let header = {'Token': this.$store.state.token};
-      let configuracion = {headers: header};
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
 
       axios
-        .put("articulo/activate", {
-          _id: this._id
-        },
-        configuracion)
+        .put(
+          "articulo/activate",
+          {
+            _id: this._id,
+          },
+          configuracion
+        )
         .then((response) => {
           this.limpiar();
           this.close();
@@ -359,14 +414,17 @@ export default {
     },
 
     desactivar() {
-      let header = {'Token': this.$store.state.token};
-      let configuracion = {headers: header};
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
 
       axios
-        .put("articulo/deactivate", {
-          _id: this._id
-        },
-        configuracion)
+        .put(
+          "articulo/deactivate",
+          {
+            _id: this._id,
+          },
+          configuracion
+        )
         .then((response) => {
           this.limpiar();
           this.close();
@@ -377,7 +435,7 @@ export default {
         });
     },
 
-    cerrar(){
+    cerrar() {
       this.adModal = 0;
     },
 
