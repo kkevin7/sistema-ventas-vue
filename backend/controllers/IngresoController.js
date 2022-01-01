@@ -51,7 +51,7 @@ export default {
     list: async (req, res, next) => {
         try {
             let valor = req.query.valor;
-            const reg = await models.Categoria
+            const reg = await models.Ingreso
                 .find({ $or: [{ 'num_comprobante': new RegExp(valor, 'i') }, { 'serie_comprobantre': new RegExp(valor, 'i') }] })
                 .populate('usuario', { nombre: 1 })
                 .populate('persona', { nombre: 1 })
