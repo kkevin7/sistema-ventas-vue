@@ -72,8 +72,10 @@
                               <td>{{ props.item.stock }}</td>
                               <td>{{ props.item.precio_venta }}</td>
                               <td>{{ props.item.descripcion }}</td>
+                            </template>
+                            <template v-slot:[`item.estado`]="{ item }">
                               <td>
-                                <div v-if="props.item.estado">
+                                <div v-if="item.estado">
                                   <span class="blue--text">Activo</span>
                                 </div>
                                 <div v-else>
@@ -186,7 +188,7 @@
             <v-autocomplete
               :items="personas"
               v-model="persona"
-              label="Proveedor"
+              label="Cliente"
             >
             </v-autocomplete>
           </v-flex>
@@ -234,9 +236,15 @@
                     </v-text-field>
                   </td>
                 </template>
+                <template v-slot:[`item.descuento`]="{ item }">
+                  <td class="text-xs-center">
+                    <v-text-field type="number" v-model="item.descuento">
+                    </v-text-field>
+                  </td>
+                </template>
                 <template v-slot:[`item.subtotal`]="{ item }">
                   <td class="text-xs-center">
-                    $ {{ item.cantidad * item.precio }}
+                    $ {{ (( item.cantidad * item.precio ) - item.descuento).toFixed(2) }}
                   </td>
                 </template>
                 <template v-slot:[`item.borrar`]="{ item }">
@@ -269,7 +277,7 @@
                   }}
                 </v-flex>
                 <v-flex class="text-xs-right">
-                  <strong>Total Neto:</strong> $ {{ (total = calcularTotal) }}
+                  <strong>Total Neto:</strong> $ {{ (total = calcularTotal).toFixed(2) }}
               </v-flex>
               </div>
 
@@ -338,6 +346,7 @@ export default {
       { text: "Articulo", value: "articulo", sortable: false },
       { text: "Cantidad", value: "cantidad", sortable: false },
       { text: "Precio", value: "precio", sortable: false },
+      { text: "Descuento", value: "descuento", sortable: false },
       { text: "Sub Total", value: "subtotal", sortable: false },
       { text: "Borrar", value: "borrar", sortable: false },
     ],
@@ -375,8 +384,7 @@ export default {
     calcularTotal: function () {
       let resultado = 0.0;
       for (let i = 0; i < this.detalles.length; i++) {
-        resultado =
-          resultado + this.detalles[i].cantidad * this.detalles[i].precio;
+        resultado = resultado + (( this.detalles[i].cantidad * this.detalles[i].precio) - this.detalles[i].descuento );
       }
       return resultado;
     },
@@ -403,7 +411,7 @@ export default {
       let configuracion = { headers: header };
       let personaArray = [];
       axios
-        .get("persona/list", configuracion)
+        .get("persona/listClientes", configuracion)
         .then((response) => {
           personaArray = response.data;
           personaArray.map((cat) => {
@@ -439,6 +447,7 @@ export default {
           articulo: data.nombre,
           cantidad: 1,
           precio: data.precio_venta,
+          descuento: 0
         });
         this.codigo = "";
       }

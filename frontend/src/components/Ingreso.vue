@@ -72,8 +72,10 @@
                               <td>{{ props.item.stock }}</td>
                               <td>{{ props.item.precio_venta }}</td>
                               <td>{{ props.item.descripcion }}</td>
+                            </template>
+                            <template v-slot:[`item.estado`]="{ item }">
                               <td>
-                                <div v-if="props.item.estado">
+                                <div v-if="item.estado">
                                   <span class="blue--text">Activo</span>
                                 </div>
                                 <div v-else>
@@ -145,7 +147,6 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
-            
           </v-toolbar>
         </template>
 
@@ -255,7 +256,7 @@
               </v-data-table>
 
               <div class="w-100 my-4">
-                  <v-flex class="text-xs-right">
+                <v-flex class="text-xs-right">
                   <strong>Total Parcial:</strong> $
                   {{ (totalParcial = (total - totalImpuesto).toFixed(2)) }}
                 </v-flex>
@@ -270,9 +271,8 @@
                 </v-flex>
                 <v-flex class="text-xs-right">
                   <strong>Total Neto:</strong> $ {{ (total = calcularTotal) }}
-              </v-flex>
+                </v-flex>
               </div>
-
             </template>
           </v-flex>
           <v-flex xs="12" sm="12" md="12" lg="12" xl="12" v-show="valida">
@@ -284,15 +284,12 @@
             ></div>
           </v-flex>
           <v-flex xs="12" sm="12" md="12" lg="12" xl="12">
-            <v-btn 
-              color="blue darken-1" 
-              text 
-              @click.native="ocultarNuevo()"
+            <v-btn color="blue darken-1" text @click.native="ocultarNuevo()"
               >Cancelar</v-btn
             >
-            <v-btn 
-              color="success" 
-              text 
+            <v-btn
+              color="success"
+              text
               @click.native="guardar()"
               v-if="verDetalle === 0"
               >Guardar</v-btn
@@ -329,7 +326,7 @@ export default {
     persona: "",
     personas: [],
     tipo_comprobante: "",
-    num_comprobante: '',
+    num_comprobante: "",
     comprobantes: ["BOLETA", "FACTURA", "TICKET", "GUIA"],
     serie_comprobante: "",
     impuesto: 0.18,
@@ -403,7 +400,7 @@ export default {
       let configuracion = { headers: header };
       let personaArray = [];
       axios
-        .get("persona/list", configuracion)
+        .get("persona/listProveedores", configuracion)
         .then((response) => {
           personaArray = response.data;
           personaArray.map((cat) => {
@@ -501,7 +498,7 @@ export default {
         });
     },
 
-    verIngreso(item){
+    verIngreso(item) {
       this.limpiar();
       this.tipo_comprobante = item.tipo_comprobante;
       this.serie_comprobante = item.serie_comprobante;
@@ -525,7 +522,7 @@ export default {
       this.totalImpuesto = 0;
       this.detalles = [];
       this.verNuevo = 0;
-      this.verDetalle= 0;
+      this.verDetalle = 0;
 
       this.valida = 0;
       this.validaMensaje = [];
