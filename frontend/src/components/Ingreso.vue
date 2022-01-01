@@ -150,13 +150,13 @@
         </template>
 
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
           <template v-if="item.estado">
             <v-icon small @click="toogleActivate(2, item)">block</v-icon>
           </template>
           <template v-else>
             <v-icon small @click="toogleActivate(1, item)">check</v-icon>
           </template>
+          <v-icon small class="ml-2" @click="verIngreso(item)">tab</v-icon>
         </template>
 
         <template v-slot:no-data>
@@ -284,10 +284,17 @@
             ></div>
           </v-flex>
           <v-flex xs="12" sm="12" md="12" lg="12" xl="12">
-            <v-btn color="blue darken-1" text @click.native="ocultarNuevo()"
+            <v-btn 
+              color="blue darken-1" 
+              text 
+              @click.native="ocultarNuevo()"
               >Cancelar</v-btn
             >
-            <v-btn color="success" text @click.native="guardar()"
+            <v-btn 
+              color="success" 
+              text 
+              @click.native="guardar()"
+              v-if="verDetalle === 0"
               >Guardar</v-btn
             >
           </v-flex>
@@ -353,6 +360,8 @@ export default {
     total: 0,
     totalParcial: 0,
     totalImpuesto: 0,
+
+    verDetalle: 0,
 
     valida: 0,
     validaMensaje: [],
@@ -478,6 +487,32 @@ export default {
         });
     },
 
+    listarDetalles(id) {
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
+      axios
+        .get("ingreso/query?_id=" + id, configuracion)
+        .then((response) => {
+          console.log(response.data);
+          this.detalles = response.data.detalles;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    verIngreso(item){
+      this.limpiar();
+      this.tipo_comprobante = item.tipo_comprobante;
+      this.serie_comprobante = item.serie_comprobante;
+      this.num_comprobante = item.num_comprobante;
+      this.persona = item.persona._id;
+      this.impuesto = item.impuesto;
+      this.listarDetalles(item._id);
+      this.verNuevo = 1;
+      this.verDetalle = 1;
+    },
+
     limpiar() {
       this._id = "";
       this.tipo_comprobante = "";
@@ -490,6 +525,7 @@ export default {
       this.totalImpuesto = 0;
       this.detalles = [];
       this.verNuevo = 0;
+      this.verDetalle= 0;
 
       this.valida = 0;
       this.validaMensaje = [];
@@ -526,6 +562,7 @@ export default {
     },
     ocultarNuevo() {
       this.verNuevo = 0;
+      this.limpiar();
     },
 
     guardar() {
@@ -567,7 +604,7 @@ export default {
 
     toogleActivate(action, item) {
       this.adModal = 1;
-      this.adNombre = item.nombre;
+      this.adNombre = item.num_comprobante;
       this._id = item._id;
       if (action === 1) {
         this.adAccion = 1;
