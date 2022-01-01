@@ -176,7 +176,7 @@
               <v-data-table
                 :headers="cabeceraDetalles"
                 :items="detalles"
-                hide-actions
+                hide-default-footer
                 class="elevation-1"
               >
                 <template slot="items" slot-scope="props">
@@ -189,9 +189,9 @@
                     $ {{ item.cantidad * item.precio }}
                   </td>
                 </template>
-                <template v-slot:[`item.borrar`]>
+                <template v-slot:[`item.borrar`]="{ item }">
                   <td>
-                    <v-icon small class="mr-2">delete</v-icon>
+                    <v-icon small class="mr-2" @click="eliminarDetalle(detalles, item)">delete</v-icon>
                   </td>
                 </template>
                 <template slot="no-data">
@@ -258,10 +258,7 @@ export default {
       { text: "Sub Total", value: "subtotal", sortable: false },
       { text: "Borrar", value: "borrar", sortable: false },
     ],
-    detalles: [
-      { _id: "1000", articulo: "Articulo 1", cantidad: "5", precio: "10" },
-      { _id: "2000", articulo: "Articulo 2", cantidad: "7", precio: "10" },
-    ],
+    detalles: [],
     verNuevo: 0,
 
     valida: 0,
@@ -269,7 +266,7 @@ export default {
     adModal: 0,
     adAccion: 0,
     adNombre: "",
-    adId: "",
+    errorArticulo: null,
   }),
 
   computed: {
@@ -308,6 +305,54 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+
+    buscarCodigo() {
+      this.errorArticulo = null;
+      let header = { Token: this.$store.state.token };
+      let configuracion = { headers: header };
+      axios
+        .get("articulo/queryCodigo?codigo="+this.codigo, configuracion)
+        .then((response) => {
+          this.agregarDetalle(response.data);
+        })
+        .catch((error) => {
+          this.errorArticulo = 'No existe el articulo.'
+        });
+    },
+
+    agregarDetalle(data){
+      this.errorArticulo=null;
+      if(this.encuentra(data._id) === true){
+        this.errorArticulo='El articulo ya ha sido agregado.';
+      }
+      else{
+        this.detalles.push(
+          {
+            _id: data._id,
+            articulo: data.nombre,
+            cantidad: 1,
+            precio: data.precio_venta,
+          }
+        );
+      }
+    },
+
+    encuentra(id){
+      let sw=0;
+      for (let i = 0; i < this.detalles.length; i++) {
+        if(this.detalles[i]._id === id){
+          sw=true;
+        }
+      }
+      return sw;
+    },
+
+    eliminarDetalle(arr, item){
+      let i = arr.indexOf(item);
+      if(i !== -1){
+        arr.splice(i, 1);
+      }
     },
 
     listar() {
