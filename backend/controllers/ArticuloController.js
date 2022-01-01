@@ -33,8 +33,9 @@ export default {
     },
     queryCodigo: async (req, res, next) => {
         try {
+            console.log(req.query.codigo);
             const reg = await models.Articulo
-            .findOne({ _id: req.query.codigo })
+            .findOne({ codigo: req.query.codigo })
             .populate('categoria',{nombre:1});
             if (!reg) {
                 res.status(404).send({
