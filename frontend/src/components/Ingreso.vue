@@ -179,10 +179,20 @@
                 hide-default-footer
                 class="elevation-1"
               >
-                <template slot="items" slot-scope="props">
-                  <td class="text-xs-center">{{ props.item.articulo }}</td>
-                  <td class="text-xs-center">{{ props.item.cantidad }}</td>
-                  <td class="text-xs-center">{{ props.item.precio }}</td>
+                <template v-slot:[`item.articulo`]="{ item }">
+                  <td class="text-xs-center">{{ item.articulo }}</td>
+                </template>
+                <template v-slot:[`item.cantidad`]="{ item }">
+                  <td class="text-xs-center">
+                    <v-text-field type="number" v-model="item.cantidad">
+                    </v-text-field>
+                  </td>
+                </template>
+                <template v-slot:[`item.precio`]="{ item }">
+                  <td class="text-xs-center">
+                    <v-text-field type="number" v-model="item.precio">
+                    </v-text-field>
+                  </td>
                 </template>
                 <template v-slot:[`item.subtotal`]="{ item }">
                   <td class="text-xs-center">
@@ -191,7 +201,12 @@
                 </template>
                 <template v-slot:[`item.borrar`]="{ item }">
                   <td>
-                    <v-icon small class="mr-2" @click="eliminarDetalle(detalles, item)">delete</v-icon>
+                    <v-icon
+                      small
+                      class="mr-2"
+                      @click="eliminarDetalle(detalles, item)"
+                      >delete</v-icon
+                    >
                   </td>
                 </template>
                 <template slot="no-data">
@@ -312,45 +327,43 @@ export default {
       let header = { Token: this.$store.state.token };
       let configuracion = { headers: header };
       axios
-        .get("articulo/queryCodigo?codigo="+this.codigo, configuracion)
+        .get("articulo/queryCodigo?codigo=" + this.codigo, configuracion)
         .then((response) => {
           this.agregarDetalle(response.data);
         })
         .catch((error) => {
-          this.errorArticulo = 'No existe el articulo.'
+          this.errorArticulo = "No existe el articulo.";
         });
     },
 
-    agregarDetalle(data){
-      this.errorArticulo=null;
-      if(this.encuentra(data._id) === true){
-        this.errorArticulo='El articulo ya ha sido agregado.';
-      }
-      else{
-        this.detalles.push(
-          {
-            _id: data._id,
-            articulo: data.nombre,
-            cantidad: 1,
-            precio: data.precio_venta,
-          }
-        );
+    agregarDetalle(data) {
+      this.errorArticulo = null;
+      if (this.encuentra(data._id) === true) {
+        this.errorArticulo = "El articulo ya ha sido agregado.";
+      } else {
+        this.detalles.push({
+          _id: data._id,
+          articulo: data.nombre,
+          cantidad: 1,
+          precio: data.precio_venta,
+        });
+        this.codigo = "";
       }
     },
 
-    encuentra(id){
-      let sw=0;
+    encuentra(id) {
+      let sw = 0;
       for (let i = 0; i < this.detalles.length; i++) {
-        if(this.detalles[i]._id === id){
-          sw=true;
+        if (this.detalles[i]._id === id) {
+          sw = true;
         }
       }
       return sw;
     },
 
-    eliminarDetalle(arr, item){
+    eliminarDetalle(arr, item) {
       let i = arr.indexOf(item);
-      if(i !== -1){
+      if (i !== -1) {
         arr.splice(i, 1);
       }
     },
