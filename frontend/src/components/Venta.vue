@@ -887,6 +887,7 @@ export default {
   padding: 20px;
   font-family: Arial, sans-serif;
   font-size: 16px;
+  color: #000;
 }
 
 #logo {

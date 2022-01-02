@@ -9,7 +9,7 @@
     >
       <v-list dense>
         <template v-if="esAdministrador || esAlmacenero || esVendedor">
-          <v-list-item>
+          <v-list-item :to="{ name: 'home' }">
             <v-list-item-action>
               <v-icon>home</v-icon>
             </v-list-item-action>
