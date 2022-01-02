@@ -10,7 +10,7 @@ import router from './routes/index';
 mongoose.Promise + global.Promise;
 const dbUrl = 'mongodb://localhost:27017';
 mongoose.connect(dbUrl, {
-    dbName: "dbsistema",
+    dbName: "sistema_ventas",
     authSource: "admin",
     user: "root",
     pass: "12345",
